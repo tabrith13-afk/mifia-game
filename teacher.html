@@ -449,14 +449,36 @@ async function startVoting() {
 }
 
 async function endVoting() {
-  const { tops, isTie, maxV } = getVoteData();
-  console.log('tops:', JSON.stringify(tops));  // ← 이 줄 추가
-  console.log('isTie:', isTie, 'maxV:', maxV); // ← 이 줄 추가
+  // Firebase에서 최신 votes 직접 읽기 (로컬 캐시 지연 문제 방지)
+  const snap     = await get(ref(db, 'game/votes'));
+  const latestVotes = snap.val() || {};
+
+  // 최신 votes로 직접 집계
+  const tally = {};
+  Object.values(students).forEach(s => { tally[String(s.number)] = 0; });
+  Object.values(latestVotes).forEach(v => {
+    if (v && v.target && tally[String(v.target)] !== undefined)
+      tally[String(v.target)]++;
+  });
+  const results = Object.values(students)
+    .filter(s => tally[String(s.number)] > 0)
+    .map(s => ({ number: s.number, name: s.name, role: s.role, votes: tally[String(s.number)] }))
+    .sort((a,b) => b.votes - a.votes);
+  const maxV  = results.length > 0 ? results[0].votes : 0;
+  const tops  = results.filter(r => r.votes === maxV);
+  const isTie = tops.length > 1;
+
   const curRound = gameState.round || 1;
-  const updates  = { status:'result', lastVotes: gameState.votes||{}, round: curRound+1, tieElimNum:'', tieElimName:'' };
-  if (!isTie && tops.length===1 && maxV>0) {
+  const updates  = {
+    status: 'result',
+    lastVotes: latestVotes,
+    round: curRound + 1,
+    tieElimNum: '', tieElimName: ''
+  };
+
+  if (!isTie && tops.length === 1 && maxV > 0) {
     await update(ref(db, 'game'), updates);
-    await update(ref(db, `students/${tops[0].number}`), { alive:false });
+    await update(ref(db, `students/${tops[0].number}`), { alive: false });
     await checkWinCondition();
   } else {
     await update(ref(db, 'game'), updates);
