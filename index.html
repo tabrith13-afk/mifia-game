@@ -305,8 +305,12 @@ function onStateChange() {
 
   } else if (status === 'night_mafia') {
     const r = students[String(me.number)] ? students[String(me.number)].role : me.role;
-    if (r === '마피아') renderNight('mafia');
-    else showScreen('blackScreen');
+    if (r === '마피아') {
+      me.role = '마피아';
+      renderNight('mafia');
+    } else {
+      showScreen('blackScreen');
+    }
 
   } else if (status === 'night_police') {
     const r = students[String(me.number)] ? students[String(me.number)].role : me.role;
@@ -401,9 +405,10 @@ function renderNight(mode) {
     document.getElementById('nightBtn').addEventListener('click', async () => {
       if (!selectedNight) return;
       document.getElementById('nightBtn').disabled = true;
-      await update(ref(db,'game'), { doctorTarget: selectedNight });
+      // 의사 선택 완료 → 자동으로 마피아 투표 단계로
+      await update(ref(db,'game'), { doctorTarget: selectedNight, status: 'night_mafia' });
       grid.innerHTML = '';
-      action.innerHTML = '<div class="voted-notice"><div class="v-icon">🏥</div><div class="v-text">보호 완료! 마피아 투표를 기다립니다.</div></div>';
+      action.innerHTML = '<div class="voted-notice"><div class="v-icon">🏥</div><div class="v-text">보호 완료! 마피아 투표가 시작됩니다.</div></div>';
     });
     showScreen('nightScreen');
 
@@ -442,10 +447,15 @@ function renderNight(mode) {
     document.getElementById('nightBtn').addEventListener('click', async () => {
       if (!selectedNight) return;
       document.getElementById('nightBtn').disabled = true;
-      const target  = students[String(selectedNight)];
-      const result  = target && target.role === '마피아' ? '마피아' : '시민';
+      const target = students[String(selectedNight)];
+      const result = target && target.role === '마피아' ? '마피아' : '시민';
+      // 경찰 결과 저장 + 야간 결과 처리
+      const doctorT = gameState.doctorTarget || '';
+      const mafiaT  = gameState.mafiaTarget  || '';
+      const saved   = mafiaT && mafiaT === doctorT;
+      // 마피아 대상 탈락 처리는 teacher에서 하므로 여기선 status만 변경
+      await update(ref(db,'game'), { policeTarget: selectedNight, status: 'night_result' });
       showPoliceResult(target ? target.name : '?', result);
-      await update(ref(db,'game'), { policeTarget: selectedNight, policeDone: true });
     });
     showScreen('nightScreen');
   }
