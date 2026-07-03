@@ -301,9 +301,13 @@ function onGameStateChange() {
   if (!gameState || !me) return;
   const status = gameState.status || 'waiting';
 
-  // 탈락 체크 (Firebase students에서 최신 상태 확인)
+  // 최신 내 정보 동기화 (role, alive 모두 Firebase 기준으로)
   const myData = students[String(me.number)];
-  if (myData) me.alive = myData.alive !== false && myData.alive !== 'false';
+  if (myData) {
+    me.alive       = myData.alive !== false && myData.alive !== 'false';
+    me.role        = myData.role        || me.role;
+    me.roleChecked = myData.roleChecked || me.roleChecked;
+  }
   if (!me.alive && status !== 'win') { showScreen('elimScreen'); lastStatus = status; return; }
 
   // 승리 체크
@@ -334,15 +338,19 @@ function onGameStateChange() {
     }
 
   } else if (status === 'night_doctor') {
-    if (me.role === '의사') renderNightScreen('doctor');
+    const myRoleNow = (students[String(me.number)] && students[String(me.number)].role) || me.role;
+    if (myRoleNow === '의사') { me.role = '의사'; renderNightScreen('doctor'); }
     else showScreen('blackScreen');
 
   } else if (status === 'night_mafia') {
-    if (me.role === '마피아') renderNightScreen('mafia');
+    // students에서 직접 확인 (me.role 캐시 문제 대비)
+    const myRoleNow = (students[String(me.number)] && students[String(me.number)].role) || me.role;
+    if (myRoleNow === '마피아') { me.role = '마피아'; renderNightScreen('mafia'); }
     else showScreen('blackScreen');
 
   } else if (status === 'night_police') {
-    if (me.role === '경찰') renderNightScreen('police');
+    const myRoleNow = (students[String(me.number)] && students[String(me.number)].role) || me.role;
+    if (myRoleNow === '경찰') { me.role = '경찰'; renderNightScreen('police'); }
     else showScreen('blackScreen');
 
   } else if (status === 'night_result') {
