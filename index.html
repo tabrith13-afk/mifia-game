@@ -221,14 +221,13 @@ import { getDatabase, ref, onValue, set, get, update } from 'https://www.gstatic
 
 // ★ 여기에 Firebase 설정 붙여넣기
 const firebaseConfig = {
-  apiKey: "AIzaSyCfs53WSXyT3wNRpCJKfx-lylAQKjf0ZjQ",
-  authDomain: "mafia-65163.firebaseapp.com",
-  databaseURL: "https://mafia-65163-default-rtdb.firebaseio.com",
-  projectId: "mafia-65163",
-  storageBucket: "mafia-65163.firebasestorage.app",
-  messagingSenderId: "516118446900",
-  appId: "1:516118446900:web:864350c44cf60732721b61",
-  measurementId: "G-BJSKJMXP1G"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -302,7 +301,9 @@ function onGameStateChange() {
   if (!gameState || !me) return;
   const status = gameState.status || 'waiting';
 
-  // 탈락 체크
+  // 탈락 체크 (Firebase students에서 최신 상태 확인)
+  const myData = students[String(me.number)];
+  if (myData) me.alive = myData.alive !== false && myData.alive !== 'false';
   if (!me.alive && status !== 'win') { showScreen('elimScreen'); lastStatus = status; return; }
 
   // 승리 체크
@@ -380,7 +381,7 @@ window.confirmRole = async function() {
 
 // ── 낮 투표 그리드 ──
 function getAliveStudents() {
-  return Object.values(students).filter(s => s.alive !== false).sort((a,b) => a.number - b.number);
+  return Object.values(students).filter(s => s.alive !== false && s.alive !== 'false').sort((a,b) => Number(a.number) - Number(b.number));
 }
 
 function renderDayGrid() {
@@ -422,41 +423,49 @@ function resetVoteUI() {
 
 // ── 야간 그리드 ──
 function renderNightScreen(mode) {
-  if (lastStatus === 'night_' + mode.replace('night_','')) return; // 중복 렌더링 방지
-
   const titleEl = document.getElementById('nightTitle');
   const descEl  = document.getElementById('nightDesc');
   const grid    = document.getElementById('nightGrid');
   const action  = document.getElementById('nightAction');
-  nightTarget   = null;
-  grid.innerHTML = '';
 
   const alive = getAliveStudents();
 
   if (mode === 'doctor') {
+    // 의사: 이미 선택 완료했으면 다시 렌더링 안 함
+    if (gameState.doctorTarget && lastStatus === 'night_doctor') return;
     titleEl.textContent = '🏥 의사의 밤'; titleEl.className = 'night-title doctor';
     descEl.textContent  = '오늘 밤 지킬 사람을 한 명 선택하세요.';
+    nightTarget = null; grid.innerHTML = '';
     alive.forEach(s => makeNightBtn(s, 'night-sel', grid));
     action.innerHTML = '<button class="btn-vote green" id="nightBtn" disabled onclick="submitDoctor()">🏥 이 사람을 지킵니다</button>';
 
   } else if (mode === 'mafia') {
     titleEl.textContent = '🔪 마피아의 밤'; titleEl.className = 'night-title mafia';
     descEl.textContent  = '제거할 사람에게 투표하세요. (마피아끼리 투표)';
-    // 이미 투표했으면 완료 화면
-    if (gameState.nightVotes && gameState.nightVotes[me.number]) {
+    // 이미 투표했으면 완료 화면으로 (그리드 재렌더링 안 함)
+    if (gameState.nightVotes && gameState.nightVotes[String(me.number)]) {
+      if (lastStatus === 'night_mafia') return; // 이미 완료 화면 표시 중
       grid.innerHTML = '';
       action.innerHTML = '<div class="voted-notice"><div class="v-icon">🗳️</div><div class="v-text">투표 완료! 기다리세요.</div></div>';
       showScreen('nightScreen'); return;
     }
-    alive.forEach(s => {
-      const isMafia = students[s.number] && students[s.number].role === '마피아';
-      makeNightBtn(s, 'mafia-vote', grid, isMafia);
-    });
-    action.innerHTML = '<button class="btn-vote purple" id="nightBtn" disabled onclick="submitMafiaVote()">🔪 이 사람을 제거합니다</button>';
+    // 새로 진입 시만 그리드 렌더링
+    if (lastStatus !== 'night_mafia') {
+      nightTarget = null; grid.innerHTML = '';
+      alive.forEach(s => {
+        // 문자열 키로 접근, 마피아끼리 투표 불가
+        const isMafia = students[String(s.number)] && students[String(s.number)].role === '마피아';
+        makeNightBtn(s, 'mafia-vote', grid, isMafia);
+      });
+      action.innerHTML = '<button class="btn-vote purple" id="nightBtn" disabled onclick="submitMafiaVote()">🔪 이 사람을 제거합니다</button>';
+    }
 
   } else if (mode === 'police') {
+    // 경찰: 새로 진입 시만 렌더링
+    if (lastStatus === 'night_police') return;
     titleEl.textContent = '🚔 경찰의 밤'; titleEl.className = 'night-title police';
     descEl.textContent  = '조사할 사람을 한 명 선택하세요.';
+    nightTarget = null; grid.innerHTML = '';
     alive.forEach(s => makeNightBtn(s, 'police-sel', grid));
     action.innerHTML = '<button class="btn-vote orange" id="nightBtn" disabled onclick="submitPolice()">🔍 이 사람을 조사합니다</button>';
   }
