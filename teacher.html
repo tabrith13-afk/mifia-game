@@ -486,20 +486,38 @@ async function endMafiaVote() {
     const tops = results.filter(([,v]) => v === maxV);
     mafiaTarget = tops[Math.floor(Math.random()*tops.length)][0];
   }
-  const hasPolice  = Object.values(students).some(s => s.alive!==false && s.role==='경찰');
-  const nextStatus = hasPolice ? 'night_police' : 'night_result';
-  await update(ref(db,'game'), { status:nextStatus, mafiaTarget });
-  if (nextStatus === 'night_result') {
+  const hasPolice = Object.values(students).some(s => s.alive!==false && s.role==='경찰');
+
+  if (hasPolice) {
+    // 경찰 단계로 → 경찰이 night_result로 바꿈
+    await update(ref(db,'game'), { status:'night_police', mafiaTarget });
+  } else {
+    // 경찰 없음 → 바로 탈락 처리 후 night_result
     const doctor = gameState.doctorTarget || '';
     const saved  = mafiaTarget && mafiaTarget === doctor;
-    if (mafiaTarget && !saved) await update(ref(db,`students/${mafiaTarget}`), { alive:false });
-    await update(ref(db,'game'), { status:'night_result' });
+    if (mafiaTarget && !saved) {
+      await update(ref(db,`students/${mafiaTarget}`), { alive:false });
+    }
+    await update(ref(db,'game'), { status:'night_result', mafiaTarget });
     checkWinCondition();
   }
   showToast('🔪 마피아 투표 종료!');
 }
 
 async function finishNight() {
+  // 경찰이 night_result로 바꾼 경우 탈락 처리가 안 됐을 수 있으므로 여기서 처리
+  if (gameState.status === 'night_result') {
+    const mafiaT = gameState.mafiaTarget || '';
+    const doctorT= gameState.doctorTarget || '';
+    const saved  = mafiaT && mafiaT === doctorT;
+    if (mafiaT && !saved) {
+      const stuSnap = await get(ref(db, `students/${mafiaT}`));
+      if (stuSnap.exists() && stuSnap.val().alive !== false) {
+        await update(ref(db,`students/${mafiaT}`), { alive:false });
+        await checkWinCondition();
+      }
+    }
+  }
   await update(ref(db,'game'), { status:'waiting' });
   showToast('☀️ 야간 종료!');
 }
