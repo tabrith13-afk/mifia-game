@@ -8,8 +8,6 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow-y:auto}
-
-/* ── 로그인 ── */
 #loginScreen{text-align:center;padding:30px 20px;width:100%;max-width:380px}
 .game-logo{font-size:52px;margin-bottom:8px}
 .game-title{font-size:26px;font-weight:800;letter-spacing:4px;color:#e74c3c;margin-bottom:6px;text-shadow:0 0 20px rgba(231,76,60,.6)}
@@ -22,8 +20,6 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:#0a0
 .btn-login{width:100%;padding:16px;background:#e74c3c;border:none;border-radius:12px;color:#fff;font-size:18px;font-weight:800;cursor:pointer;margin-top:8px;transition:all .2s;letter-spacing:2px}
 .btn-login:hover{background:#c0392b}.btn-login:disabled{background:#555;cursor:not-allowed}
 .err{color:#e74c3c;font-size:13px;margin-top:12px;min-height:20px}
-
-/* ── 역할 ── */
 #roleScreen{display:none;text-align:center;padding:20px;width:100%;max-width:400px}
 .role-header{font-size:16px;color:#888;margin-bottom:20px}
 .role-card{background:#111;border-radius:24px;padding:40px 30px;margin-bottom:24px;border:3px solid}
@@ -40,8 +36,6 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:#0a0
 .btn-confirm{width:100%;padding:16px;border:none;border-radius:12px;color:#fff;font-size:17px;font-weight:800;cursor:pointer;letter-spacing:2px;transition:all .2s}
 .btn-confirm.citizen{background:#3498db}.btn-confirm.mafia{background:#e74c3c}
 .btn-confirm.doctor{background:#2ecc71}.btn-confirm.police{background:#f39c12}
-
-/* ── 대기 ── */
 #blackScreen{display:none;text-align:center;padding:30px;width:100%}
 .black-icon{font-size:48px;margin-bottom:16px;opacity:.4}
 .black-msg{font-size:18px;color:#333;letter-spacing:2px;margin-bottom:8px}
@@ -49,42 +43,36 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:#0a0
 .dot{display:inline-block;width:6px;height:6px;background:#333;border-radius:50%;margin:0 3px;animation:pulse 1.4s infinite ease-in-out}
 .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
 @keyframes pulse{0%,80%,100%{opacity:.2}40%{opacity:1}}
-
-/* ── 낮 투표 ── */
 #voteScreen{display:none;padding:20px 16px 48px;width:100%;max-width:500px}
 .vote-title{font-size:22px;font-weight:800;color:#e74c3c;letter-spacing:2px;margin-bottom:8px;text-align:center}
 .vote-desc{font-size:13px;color:#888;text-align:center;margin-bottom:20px}
 .s-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
 .s-btn{height:64px;border-radius:12px;border:2px solid #333;background:#1a1a1a;color:#fff;cursor:pointer;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:all .15s;padding:4px}
 .s-btn .snum{font-size:10px;color:#888}.s-btn .sname{font-size:13px}
-.s-btn:hover:not(.elim):not(.me):not(.mafia-self){border-color:#e74c3c;background:#2a1a1a;transform:scale(1.04)}
+.s-btn:hover:not(.elim):not(.me):not(.no-sel){border-color:#e74c3c;background:#2a1a1a;transform:scale(1.04)}
 .s-btn.selected{border-color:#e74c3c;background:#2a0a0a;box-shadow:0 0 14px rgba(231,76,60,.5)}
 .s-btn.selected .sname{color:#e74c3c}
 .s-btn.elim{opacity:.22;cursor:not-allowed;text-decoration:line-through}
 .s-btn.me{border-color:#444;opacity:.45;cursor:not-allowed}
-.s-btn.mafia-self{border-color:#444;opacity:.3;cursor:not-allowed}
-.s-btn.night-sel:hover:not(.elim){border-color:#2ecc71;background:#0a2a1a}
-.s-btn.night-sel.selected{border-color:#2ecc71;background:#0a2a1a;box-shadow:0 0 14px rgba(46,204,113,.5)}
-.s-btn.night-sel.selected .sname{color:#2ecc71}
-.s-btn.police-sel:hover:not(.elim){border-color:#f39c12;background:#2a1a0a}
-.s-btn.police-sel.selected{border-color:#f39c12;background:#2a1a0a;box-shadow:0 0 14px rgba(243,156,18,.5)}
-.s-btn.police-sel.selected .sname{color:#f39c12}
-.s-btn.mafia-vote:hover:not(.elim):not(.mafia-self){border-color:#9b59b6;background:#1a0a2a}
-.s-btn.mafia-vote.selected{border-color:#9b59b6;background:#1a0a2a;box-shadow:0 0 14px rgba(155,89,182,.5)}
-.s-btn.mafia-vote.selected .sname{color:#9b59b6}
+.s-btn.no-sel{border-color:#444;opacity:.3;cursor:not-allowed}
+.s-btn.ns:hover:not(.elim):not(.no-sel){border-color:#2ecc71;background:#0a2a1a}
+.s-btn.ns.selected{border-color:#2ecc71;background:#0a2a1a;box-shadow:0 0 14px rgba(46,204,113,.5)}
+.s-btn.ns.selected .sname{color:#2ecc71}
+.s-btn.ps:hover:not(.elim){border-color:#f39c12;background:#2a1a0a}
+.s-btn.ps.selected{border-color:#f39c12;background:#2a1a0a;box-shadow:0 0 14px rgba(243,156,18,.5)}
+.s-btn.ps.selected .sname{color:#f39c12}
+.s-btn.ms:hover:not(.elim):not(.no-sel){border-color:#9b59b6;background:#1a0a2a}
+.s-btn.ms.selected{border-color:#9b59b6;background:#1a0a2a;box-shadow:0 0 14px rgba(155,89,182,.5)}
+.s-btn.ms.selected .sname{color:#9b59b6}
 .btn-vote{width:100%;padding:16px;background:#e74c3c;border:none;border-radius:12px;color:#fff;font-size:17px;font-weight:800;cursor:pointer;letter-spacing:2px;transition:all .2s}
 .btn-vote:disabled{background:#333;color:#555;cursor:not-allowed}
 .btn-vote.green{background:#2ecc71}.btn-vote.orange{background:#f39c12}.btn-vote.purple{background:#9b59b6}
 .voted-notice{text-align:center;padding:20px;background:#1a1a1a;border-radius:14px;border:2px solid #333}
 .v-icon{font-size:32px;margin-bottom:8px}.v-text{color:#aaa;font-size:14px}
-
-/* ── 야간 ── */
 #nightScreen{display:none;padding:20px 16px 48px;width:100%;max-width:500px}
 .night-title{font-size:22px;font-weight:800;letter-spacing:2px;margin-bottom:8px;text-align:center}
 .night-title.doctor{color:#2ecc71}.night-title.mafia{color:#9b59b6}.night-title.police{color:#f39c12}
 .night-desc{font-size:13px;color:#888;text-align:center;margin-bottom:20px}
-
-/* ── 투표 결과 ── */
 #resultScreen{display:none;padding:20px 16px 48px;width:100%;max-width:500px}
 .result-title{font-size:22px;font-weight:800;color:#f39c12;letter-spacing:2px;margin-bottom:6px;text-align:center}
 .result-sub{font-size:13px;color:#888;text-align:center;margin-bottom:16px}
@@ -99,29 +87,20 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:#0a0
 .elim-banner{padding:16px;border-radius:14px;text-align:center;font-size:16px;font-weight:800;margin-top:8px}
 .elim-banner.eliminated{background:rgba(231,76,60,.12);border:2px solid #e74c3c;color:#e74c3c}
 .elim-banner.tie{background:rgba(243,156,18,.1);border:2px solid #f39c12;color:#f39c12}
-
-/* ── 야간 결과 오버레이 ── */
 #nightOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:999;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px}
 .nr-icon{font-size:72px;margin-bottom:20px}
 .nr-msg{font-size:19px;font-weight:800;line-height:1.8;color:#fff}
 .nr-btn{margin-top:28px;padding:14px 36px;background:#fff;color:#111;border:none;border-radius:20px;font-size:15px;font-weight:800;cursor:pointer;letter-spacing:1px}
-.nr-timer{font-size:13px;color:#555;margin-top:12px}
-
-/* ── 경찰 결과 오버레이 ── */
 #policeOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:1000;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px}
 .po-icon{font-size:64px;margin-bottom:16px}
 .po-title{font-size:15px;color:#f39c12;font-weight:800;margin-bottom:12px;letter-spacing:2px}
 .po-msg{font-size:22px;font-weight:900;line-height:1.6}
 .po-timer{font-size:13px;color:#555;margin-top:16px}
-
-/* ── 승리 화면 ── */
 #winScreen{display:none;text-align:center;padding:30px;width:100%;max-width:400px}
 .win-icon{font-size:80px;margin-bottom:20px}
 .win-title{font-size:30px;font-weight:900;margin-bottom:12px}
 .win-title.citizen{color:#3498db}.win-title.mafia{color:#e74c3c}
 .win-msg{font-size:15px;color:#aaa;line-height:1.6}
-
-/* ── 탈락 ── */
 #elimScreen{display:none;text-align:center;padding:30px}
 .elim-icon{font-size:72px;margin-bottom:20px}
 .elim-title{font-size:28px;font-weight:800;color:#555;margin-bottom:12px}
@@ -130,53 +109,47 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:#0a0
 </head>
 <body>
 
-<!-- 로그인 -->
 <div id="loginScreen">
   <div class="game-logo">🎭</div>
   <div class="game-title">MAFIA</div>
   <div class="game-sub">번호와 비밀번호를 입력하세요</div>
   <div class="inp-group"><label>내 번호</label><input type="number" id="inNum" placeholder="번호 입력" min="1" max="40"></div>
   <div class="inp-group"><label>비밀번호</label><input type="password" id="inPw" placeholder="비밀번호 입력"></div>
-  <button class="btn-login" id="loginBtn" onclick="login()">입장하기</button>
+  <button class="btn-login" id="loginBtn">입장하기</button>
   <div class="err" id="loginErr"></div>
 </div>
 
-<!-- 역할 -->
 <div id="roleScreen">
   <div class="role-header" id="roleGreeting"></div>
   <div class="role-card" id="roleCard">
     <div class="role-icon" id="roleIcon"></div>
     <div class="role-name" id="roleName"></div>
     <div class="role-desc" id="roleDesc"></div>
-    <div class="role-tip" id="roleTip"></div>
+    <div class="role-tip"  id="roleTip"></div>
   </div>
-  <button class="btn-confirm" id="confirmBtn" onclick="confirmRole()">✅ 확인했습니다!</button>
+  <button class="btn-confirm" id="confirmBtn">✅ 확인했습니다!</button>
 </div>
 
-<!-- 대기 -->
 <div id="blackScreen">
   <div class="black-icon">🌙</div>
   <div class="black-msg">선생님의 안내를 기다리세요</div>
   <div class="black-sub"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
 </div>
 
-<!-- 낮 투표 -->
 <div id="voteScreen">
   <div class="vote-title">🗳️ 투표 시간!</div>
   <div class="vote-desc">탈락시킬 학생을 선택하세요</div>
   <div class="s-grid" id="dayGrid"></div>
-  <div id="voteAction"><button class="btn-vote" id="voteBtn" disabled onclick="submitDayVote()">투표하기</button></div>
+  <div id="voteAction"><button class="btn-vote" id="voteBtn" disabled>투표하기</button></div>
 </div>
 
-<!-- 야간 (의사/마피아/경찰) -->
 <div id="nightScreen">
   <div class="night-title" id="nightTitle"></div>
-  <div class="night-desc" id="nightDesc"></div>
+  <div class="night-desc"  id="nightDesc"></div>
   <div class="s-grid" id="nightGrid"></div>
   <div id="nightAction"></div>
 </div>
 
-<!-- 투표 결과 -->
 <div id="resultScreen">
   <div class="result-title">🏆 투표 결과</div>
   <div class="result-sub" id="resultRound"></div>
@@ -185,41 +158,36 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:#0a0
   <div id="resultBanner"></div>
 </div>
 
-<!-- 야간 결과 오버레이 -->
 <div id="nightOverlay">
   <div class="nr-icon" id="nrIcon"></div>
-  <div class="nr-msg" id="nrMsg"></div>
-  <button class="nr-btn" onclick="closeNightOverlay()">✅ 확인했습니다</button>
+  <div class="nr-msg"  id="nrMsg"></div>
+  <button class="nr-btn" id="nrCloseBtn">✅ 확인했습니다</button>
 </div>
 
-<!-- 경찰 결과 오버레이 -->
 <div id="policeOverlay">
-  <div class="po-icon" id="poIcon"></div>
+  <div class="po-icon"  id="poIcon"></div>
   <div class="po-title">🔍 나만 보는 조사 결과</div>
-  <div class="po-msg" id="poMsg"></div>
+  <div class="po-msg"   id="poMsg"></div>
   <div class="po-timer" id="poTimer">5초 후 사라집니다</div>
 </div>
 
-<!-- 승리 -->
 <div id="winScreen">
-  <div class="win-icon" id="winIcon"></div>
+  <div class="win-icon"  id="winIcon"></div>
   <div class="win-title" id="winTitle"></div>
-  <div class="win-msg" id="winMsg"></div>
+  <div class="win-msg"   id="winMsg"></div>
 </div>
 
-<!-- 탈락 -->
 <div id="elimScreen">
   <div class="elim-icon">💀</div>
   <div class="elim-title">탈락했습니다</div>
   <div class="elim-msg">선생님의 안내에 따라<br>조용히 지켜봐 주세요 👀</div>
 </div>
 
-<!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, onValue, set, get, update } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { getDatabase, ref, onValue, get, update } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
-// ★ 여기에 Firebase 설정 붙여넣기
+// ★ Firebase 설정 (본인 설정으로 교체)
 const firebaseConfig = {
   apiKey: "AIzaSyCfs53WSXyT3wNRpCJKfx-lylAQKjf0ZjQ",
   authDomain: "mafia-65163.firebaseapp.com",
@@ -227,25 +195,21 @@ const firebaseConfig = {
   projectId: "mafia-65163",
   storageBucket: "mafia-65163.firebasestorage.app",
   messagingSenderId: "516118446900",
-  appId: "1:516118446900:web:864350c44cf60732721b61",
-  measurementId: "G-BJSKJMXP1G"
+  appId: "1:516118446900:web:864350c44cf60732721b61"
 };
 
 const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 
-// ── 전역 상태 ──
-let me = null;           // { number, name, role, alive, roleChecked }
-let gameState = null;    // Firebase game/ 노드
-let students = {};       // Firebase students/ 노드
-let selectedTarget = null;
-let nightTarget = null;
-let chartInst = null;
-let lastStatus = '';
-let nightOverlayShown = false;
-let policeTimerInterval = null;
-let unsubGame = null;
-let unsubStudents = null;
+let me            = null;
+let gameState     = null;
+let students      = {};
+let selectedDay   = null;
+let selectedNight = null;
+let chartInst     = null;
+let lastStatus    = '';
+let nightShown    = false;
+let policeTimer   = null;
 
 // ── 화면 전환 ──
 const SCREENS = ['loginScreen','roleScreen','blackScreen','voteScreen','nightScreen','resultScreen','winScreen','elimScreen'];
@@ -256,79 +220,68 @@ function showScreen(id) {
 }
 
 // ── 로그인 ──
-window.login = async function() {
+async function doLogin() {
   const num = document.getElementById('inNum').value.trim();
   const pw  = document.getElementById('inPw').value.trim();
   if (!num || !pw) { document.getElementById('loginErr').textContent = '번호와 비밀번호를 입력하세요.'; return; }
   const btn = document.getElementById('loginBtn');
   btn.disabled = true; btn.textContent = '확인 중...';
   document.getElementById('loginErr').textContent = '';
-
   try {
     const snap = await get(ref(db, `students/${num}`));
-    if (!snap.exists()) { throw new Error('존재하지 않는 번호입니다.'); }
+    if (!snap.exists()) throw new Error('존재하지 않는 번호입니다.');
     const s = snap.val();
     if (String(s.password).trim() !== String(pw).trim()) throw new Error('비밀번호가 틀렸습니다.');
-    me = { number: String(num), name: s.name, role: s.role || '', alive: s.alive !== false, roleChecked: s.roleChecked === true };
+    me = { number: String(num), name: s.name, role: s.role||'', alive: s.alive!==false, roleChecked: s.roleChecked===true };
     startListening();
   } catch(e) {
     document.getElementById('loginErr').textContent = e.message;
     btn.disabled = false; btn.textContent = '입장하기';
   }
-};
+}
+document.getElementById('loginBtn').addEventListener('click', doLogin);
+document.getElementById('inPw').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
+document.getElementById('inNum').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
 
-// ── Firebase 리스너 시작 ──
+// ── Firebase 구독 ──
 async function startListening() {
-  try {
-    // 1. students 먼저 완전히 로드
-    const snapS = await get(ref(db, 'students'));
-    students = snapS.val() || {};
+  // students 먼저 로드 후 game 구독
+  const snapS = await get(ref(db, 'students'));
+  students = snapS.val() || {};
+  syncMe();
+
+  onValue(ref(db, 'students'), snap => {
+    students = snap.val() || {};
     syncMe();
+    if (gameState) onStateChange();
+  });
 
-    // 2. students 실시간 구독
-    unsubStudents = onValue(ref(db, 'students'), snap => {
-      students = snap.val() || {};
-      syncMe();
-      if (gameState) onGameStateChange();
-    });
-
-    // 3. game 구독 (students 로드 완료 후)
-    unsubGame = onValue(ref(db, 'game'), snap => {
-      gameState = snap.val() || {};
-      onGameStateChange();
-    });
-
-  } catch(err) {
-    console.error('Firebase 연결 오류:', err);
-    document.getElementById('loginErr').textContent = '서버 연결 오류가 발생했습니다. 새로고침 해주세요.';
-    const btn = document.getElementById('loginBtn');
-    btn.disabled = false; btn.textContent = '입장하기';
-  }
+  onValue(ref(db, 'game'), snap => {
+    gameState = snap.val() || {};
+    onStateChange();
+  });
 }
 
-// 내 정보를 Firebase students 기준으로 동기화
 function syncMe() {
-  const myData = students[String(me.number)];
-  if (!myData) return;
-  me.alive       = myData.alive !== false && myData.alive !== 'false';
-  me.role        = myData.role  !== undefined ? myData.role : me.role;
-  me.roleChecked = myData.roleChecked === true;
+  const d = students[String(me.number)];
+  if (!d) return;
+  me.alive       = d.alive !== false && d.alive !== 'false';
+  me.role        = d.role !== undefined ? d.role : me.role;
+  me.roleChecked = d.roleChecked === true;
 }
 
-// ── 게임 상태 변경 핸들러 ──
-function onGameStateChange() {
+// ── 상태 변화 핸들러 ──
+function onStateChange() {
   if (!gameState || !me) return;
+  syncMe();
   const status = gameState.status || 'waiting';
 
-  // 탈락/승리 체크
   if (!me.alive && status !== 'win') { showScreen('elimScreen'); lastStatus = status; return; }
-
-  // 승리 체크
   if (status === 'win') { showWin(); lastStatus = status; return; }
 
   if (status === 'waiting') {
-    nightOverlayShown = false;
-    resetVoteUI();
+    nightShown = false;
+    resetDayVote();
     showScreen('blackScreen');
 
   } else if (status === 'role_assigned') {
@@ -336,38 +289,32 @@ function onGameStateChange() {
     else showScreen('blackScreen');
 
   } else if (status === 'voting') {
-    if (lastStatus !== 'voting') { resetVoteUI(); selectedTarget = null; }
+    if (lastStatus !== 'voting') { resetDayVote(); selectedDay = null; }
     showScreen('voteScreen');
     renderDayGrid();
-    if (gameState.votes && gameState.votes[me.number]) {
-      showVotedNotice();
-    }
+    if (gameState.votes && gameState.votes[me.number]) showVotedNotice();
 
   } else if (status === 'result') {
-    if (lastStatus !== 'result') {
-      renderResultScreen();
-    } else {
-      updateResultBanner(); // 동점→랜덤 확정 반영
-    }
+    if (lastStatus !== 'result') renderResult();
+    else updateBanner();
 
   } else if (status === 'night_doctor') {
-    const myRoleNow = (students[String(me.number)] && students[String(me.number)].role) || me.role;
-    if (myRoleNow === '의사') { me.role = '의사'; renderNightScreen('doctor'); }
+    const r = students[String(me.number)] ? students[String(me.number)].role : me.role;
+    if (r === '의사') renderNight('doctor');
     else showScreen('blackScreen');
 
   } else if (status === 'night_mafia') {
-    // students에서 직접 확인 (me.role 캐시 문제 대비)
-    const myRoleNow = (students[String(me.number)] && students[String(me.number)].role) || me.role;
-    if (myRoleNow === '마피아') { me.role = '마피아'; renderNightScreen('mafia'); }
+    const r = students[String(me.number)] ? students[String(me.number)].role : me.role;
+    if (r === '마피아') renderNight('mafia');
     else showScreen('blackScreen');
 
   } else if (status === 'night_police') {
-    const myRoleNow = (students[String(me.number)] && students[String(me.number)].role) || me.role;
-    if (myRoleNow === '경찰') { me.role = '경찰'; renderNightScreen('police'); }
+    const r = students[String(me.number)] ? students[String(me.number)].role : me.role;
+    if (r === '경찰') renderNight('police');
     else showScreen('blackScreen');
 
   } else if (status === 'night_result') {
-    if (!nightOverlayShown) showNightResult();
+    if (!nightShown) showNightResult();
     else showScreen('blackScreen');
   }
 
@@ -379,9 +326,8 @@ const ROLE_INFO = {
   '마피아':{ cls:'mafia',   icon:'🔪', name:'마피아', desc:'당신은 마피아입니다. 시민들 몰래 협력하여 살아남으세요!', tip:'💡 낮: 시민인 척 행동하세요<br>🌙 밤: 팀원과 함께 제거할 사람을 투표하세요' },
   '시민':  { cls:'citizen', icon:'😊', name:'시민',   desc:'당신은 시민입니다. 대화로 마피아를 찾아내세요!',         tip:'💡 낮: 의심스러운 사람을 찾아 투표하세요<br>🌙 밤: 눈을 감고 기다리세요' },
   '의사':  { cls:'doctor',  icon:'🏥', name:'의사',   desc:'당신은 의사입니다. 매 밤 한 명을 마피아로부터 지킬 수 있어요!', tip:'🌙 밤: 살릴 사람을 한 명 선택하세요<br>💡 낮: 시민처럼 행동하세요' },
-  '경찰':  { cls:'police',  icon:'🚔', name:'경찰',   desc:'당신은 경찰입니다. 매 밤 한 명을 조사해 마피아인지 알 수 있어요!', tip:'🌙 밤: 조사할 사람을 한 명 선택하세요 (결과를 혼자만 알 수 있어요)<br>💡 낮: 시민처럼 행동하세요' }
+  '경찰':  { cls:'police',  icon:'🚔', name:'경찰',   desc:'당신은 경찰입니다. 매 밤 한 명을 조사해 마피아인지 알 수 있어요!', tip:'🌙 밤: 조사할 사람을 한 명 선택하세요<br>💡 낮: 시민처럼 행동하세요' }
 };
-
 function showRole() {
   const info = ROLE_INFO[me.role] || ROLE_INFO['시민'];
   document.getElementById('roleGreeting').textContent = me.name + ' 학생의 역할은...';
@@ -389,178 +335,160 @@ function showRole() {
   document.getElementById('roleIcon').textContent = info.icon;
   document.getElementById('roleName').textContent = info.name;
   document.getElementById('roleDesc').textContent = info.desc;
-  document.getElementById('roleTip').innerHTML = info.tip;
+  document.getElementById('roleTip').innerHTML    = info.tip;
   document.getElementById('confirmBtn').className = 'btn-confirm ' + info.cls;
   showScreen('roleScreen');
 }
-
-window.confirmRole = async function() {
+document.getElementById('confirmBtn').addEventListener('click', async () => {
   await update(ref(db, `students/${me.number}`), { roleChecked: true });
   me.roleChecked = true;
   showScreen('blackScreen');
-};
+});
 
-// ── 낮 투표 그리드 ──
-function getAliveStudents() {
-  return Object.values(students).filter(s => s.alive !== false && s.alive !== 'false').sort((a,b) => Number(a.number) - Number(b.number));
+// ── 낮 투표 ──
+function getAlive() {
+  return Object.values(students).filter(s => s.alive !== false && s.alive !== 'false').sort((a,b) => Number(a.number)-Number(b.number));
 }
-
 function renderDayGrid() {
   const grid = document.getElementById('dayGrid');
   grid.innerHTML = '';
-  getAliveStudents().forEach(s => {
-    const isMe  = String(s.number) === String(me.number);
-    const btn   = document.createElement('button');
+  getAlive().forEach(s => {
+    const isMe = String(s.number) === String(me.number);
+    const btn  = document.createElement('button');
     btn.className = 's-btn' + (isMe ? ' me' : '');
     btn.innerHTML = `<span class="snum">${s.number}번</span><span class="sname">${s.name}</span>`;
-    if (String(s.number) === String(selectedTarget)) btn.classList.add('selected');
-    if (!isMe) btn.onclick = () => selectDay(String(s.number), btn);
+    if (String(s.number) === String(selectedDay)) btn.classList.add('selected');
+    if (!isMe) btn.addEventListener('click', () => {
+      document.querySelectorAll('#dayGrid .s-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedDay = String(s.number);
+      document.getElementById('voteBtn').disabled = false;
+    });
     grid.appendChild(btn);
   });
 }
-
-function selectDay(num, btn) {
-  document.querySelectorAll('#dayGrid .s-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  selectedTarget = num;
-  document.getElementById('voteBtn').disabled = false;
-}
-
-window.submitDayVote = async function() {
-  if (!selectedTarget) return;
-  document.getElementById('voteBtn').disabled = true;
-  await update(ref(db, `game/votes/${me.number}`), { target: selectedTarget, time: Date.now() });
-  showVotedNotice();
-};
-
 function showVotedNotice() {
   document.getElementById('voteAction').innerHTML = '<div class="voted-notice"><div class="v-icon">✅</div><div class="v-text">투표 완료! 결과를 기다리세요.</div></div>';
 }
-
-function resetVoteUI() {
-  selectedTarget = null;
-  document.getElementById('voteAction').innerHTML = '<button class="btn-vote" id="voteBtn" disabled onclick="submitDayVote()">투표하기</button>';
+function resetDayVote() {
+  selectedDay = null;
+  document.getElementById('voteAction').innerHTML = '<button class="btn-vote" id="voteBtn" disabled>투표하기</button>';
+  document.getElementById('voteBtn').addEventListener('click', submitDayVote);
 }
+async function submitDayVote() {
+  if (!selectedDay) return;
+  document.getElementById('voteBtn').disabled = true;
+  await update(ref(db, `game/votes/${me.number}`), { target: selectedDay, time: Date.now() });
+  showVotedNotice();
+}
+document.getElementById('voteBtn').addEventListener('click', submitDayVote);
 
-// ── 야간 그리드 ──
-function renderNightScreen(mode) {
+// ── 야간 ──
+function renderNight(mode) {
   const titleEl = document.getElementById('nightTitle');
   const descEl  = document.getElementById('nightDesc');
   const grid    = document.getElementById('nightGrid');
   const action  = document.getElementById('nightAction');
-
-  const alive = getAliveStudents();
+  const alive   = getAlive();
 
   if (mode === 'doctor') {
-    // 의사: 이미 선택 완료했으면 다시 렌더링 안 함
     if (gameState.doctorTarget && lastStatus === 'night_doctor') return;
     titleEl.textContent = '🏥 의사의 밤'; titleEl.className = 'night-title doctor';
     descEl.textContent  = '오늘 밤 지킬 사람을 한 명 선택하세요.';
-    nightTarget = null; grid.innerHTML = '';
-    alive.forEach(s => makeNightBtn(s, 'night-sel', grid));
-    action.innerHTML = '<button class="btn-vote green" id="nightBtn" disabled onclick="submitDoctor()">🏥 이 사람을 지킵니다</button>';
+    selectedNight = null; grid.innerHTML = '';
+    alive.forEach(s => makeNightBtn(s, 'ns', grid));
+    action.innerHTML = '<button class="btn-vote green" id="nightBtn" disabled>🏥 이 사람을 지킵니다</button>';
+    document.getElementById('nightBtn').addEventListener('click', async () => {
+      if (!selectedNight) return;
+      document.getElementById('nightBtn').disabled = true;
+      await update(ref(db,'game'), { doctorTarget: selectedNight });
+      grid.innerHTML = '';
+      action.innerHTML = '<div class="voted-notice"><div class="v-icon">🏥</div><div class="v-text">보호 완료! 마피아 투표를 기다립니다.</div></div>';
+    });
+    showScreen('nightScreen');
 
   } else if (mode === 'mafia') {
+    const alreadyVoted = gameState.nightVotes && gameState.nightVotes[String(me.number)];
+    if (alreadyVoted && lastStatus === 'night_mafia') return;
     titleEl.textContent = '🔪 마피아의 밤'; titleEl.className = 'night-title mafia';
-    descEl.textContent  = '제거할 사람에게 투표하세요. (마피아끼리 투표)';
-    // 이미 투표했으면 완료 화면으로 (그리드 재렌더링 안 함)
-    if (gameState.nightVotes && gameState.nightVotes[String(me.number)]) {
-      if (lastStatus === 'night_mafia') return; // 이미 완료 화면 표시 중
+    descEl.textContent  = '제거할 사람에게 투표하세요. (마피아끼리 투표 불가)';
+    if (alreadyVoted) {
       grid.innerHTML = '';
       action.innerHTML = '<div class="voted-notice"><div class="v-icon">🗳️</div><div class="v-text">투표 완료! 기다리세요.</div></div>';
       showScreen('nightScreen'); return;
     }
-    // 새로 진입 시만 그리드 렌더링
-    if (lastStatus !== 'night_mafia') {
-      nightTarget = null; grid.innerHTML = '';
-      alive.forEach(s => {
-        // 문자열 키로 접근, 마피아끼리 투표 불가
-        const isMafia = students[String(s.number)] && students[String(s.number)].role === '마피아';
-        makeNightBtn(s, 'mafia-vote', grid, isMafia);
-      });
-      action.innerHTML = '<button class="btn-vote purple" id="nightBtn" disabled onclick="submitMafiaVote()">🔪 이 사람을 제거합니다</button>';
-    }
+    selectedNight = null; grid.innerHTML = '';
+    alive.forEach(s => {
+      const isMafia = students[String(s.number)] && students[String(s.number)].role === '마피아';
+      makeNightBtn(s, 'ms', grid, isMafia);
+    });
+    action.innerHTML = '<button class="btn-vote purple" id="nightBtn" disabled>🔪 이 사람을 제거합니다</button>';
+    document.getElementById('nightBtn').addEventListener('click', async () => {
+      if (!selectedNight) return;
+      document.getElementById('nightBtn').disabled = true;
+      await update(ref(db, `game/nightVotes/${me.number}`), { target: selectedNight, time: Date.now() });
+      grid.innerHTML = '';
+      action.innerHTML = '<div class="voted-notice"><div class="v-icon">🗳️</div><div class="v-text">투표 완료! 기다리세요.</div></div>';
+    });
+    showScreen('nightScreen');
 
   } else if (mode === 'police') {
-    // 경찰: 새로 진입 시만 렌더링
     if (lastStatus === 'night_police') return;
     titleEl.textContent = '🚔 경찰의 밤'; titleEl.className = 'night-title police';
     descEl.textContent  = '조사할 사람을 한 명 선택하세요.';
-    nightTarget = null; grid.innerHTML = '';
-    alive.forEach(s => makeNightBtn(s, 'police-sel', grid));
-    action.innerHTML = '<button class="btn-vote orange" id="nightBtn" disabled onclick="submitPolice()">🔍 이 사람을 조사합니다</button>';
+    selectedNight = null; grid.innerHTML = '';
+    alive.forEach(s => makeNightBtn(s, 'ps', grid));
+    action.innerHTML = '<button class="btn-vote orange" id="nightBtn" disabled>🔍 이 사람을 조사합니다</button>';
+    document.getElementById('nightBtn').addEventListener('click', async () => {
+      if (!selectedNight) return;
+      document.getElementById('nightBtn').disabled = true;
+      const target  = students[String(selectedNight)];
+      const result  = target && target.role === '마피아' ? '마피아' : '시민';
+      showPoliceResult(target ? target.name : '?', result);
+      await update(ref(db,'game'), { policeTarget: selectedNight, policeDone: true });
+    });
+    showScreen('nightScreen');
   }
-  showScreen('nightScreen');
 }
 
 function makeNightBtn(s, cls, grid, disabled=false) {
   const btn = document.createElement('button');
-  btn.className = 's-btn ' + cls + (disabled ? ' mafia-self' : '');
+  btn.className = 's-btn ' + cls + (disabled ? ' no-sel' : '');
   btn.innerHTML = `<span class="snum">${s.number}번</span><span class="sname">${s.name}</span>`;
-  if (!disabled) btn.onclick = () => selectNight(String(s.number), btn);
+  if (!disabled) btn.addEventListener('click', () => {
+    document.querySelectorAll('#nightGrid .s-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedNight = String(s.number);
+    const nb = document.getElementById('nightBtn');
+    if (nb) nb.disabled = false;
+  });
   grid.appendChild(btn);
 }
 
-function selectNight(num, btn) {
-  document.querySelectorAll('#nightGrid .s-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  nightTarget = num;
-  const nb = document.getElementById('nightBtn');
-  if (nb) nb.disabled = false;
-}
-
-window.submitDoctor = async function() {
-  if (!nightTarget) return;
-  const nb = document.getElementById('nightBtn'); if(nb) nb.disabled=true;
-  await update(ref(db, 'game'), { doctorTarget: nightTarget });
-  document.getElementById('nightGrid').innerHTML = '';
-  document.getElementById('nightAction').innerHTML = '<div class="voted-notice"><div class="v-icon">🏥</div><div class="v-text">보호 완료! 마피아 투표를 기다립니다.</div></div>';
-};
-
-window.submitMafiaVote = async function() {
-  if (!nightTarget) return;
-  const nb = document.getElementById('nightBtn'); if(nb) nb.disabled=true;
-  await update(ref(db, `game/nightVotes/${me.number}`), { target: nightTarget, time: Date.now() });
-  document.getElementById('nightGrid').innerHTML = '';
-  document.getElementById('nightAction').innerHTML = '<div class="voted-notice"><div class="v-icon">🗳️</div><div class="v-text">투표 완료! 기다리세요.</div></div>';
-};
-
-window.submitPolice = async function() {
-  if (!nightTarget) return;
-  const nb = document.getElementById('nightBtn'); if(nb) nb.disabled=true;
-  const targetStudent = students[nightTarget];
-  const result = targetStudent && targetStudent.role === '마피아' ? '마피아' : '시민';
-  // 경찰 결과는 본인만 보임 → Firebase에 저장하지 않고 로컬에서만 처리
-  showPoliceResult(targetStudent ? targetStudent.name : '?', result);
-  // 교사 화면이 경찰 단계 종료할 수 있도록 완료 기록
-  await update(ref(db, 'game'), { policeTarget: nightTarget, policeDone: true });
-};
-
-// ── 경찰 결과 (5초, 폴링 차단) ──
+// ── 경찰 결과 (5초) ──
 function showPoliceResult(name, result) {
-  if (policeTimerInterval) clearInterval(policeTimerInterval);
-  const overlay = document.getElementById('policeOverlay');
+  if (policeTimer) clearInterval(policeTimer);
   const isM = result === '마피아';
   document.getElementById('poIcon').textContent = isM ? '🚨' : '✅';
-  document.getElementById('poMsg').innerHTML = `<strong>${name}</strong> 학생은<br><span style="color:${isM?'#e74c3c':'#2ecc71'};font-size:28px">${result}</span> 입니다!`;
-  overlay.style.display = 'flex';
+  document.getElementById('poMsg').innerHTML    = `<strong>${name}</strong> 학생은<br><span style="color:${isM?'#e74c3c':'#2ecc71'};font-size:28px">${result}</span> 입니다!`;
+  document.getElementById('policeOverlay').style.display = 'flex';
   let count = 5;
   document.getElementById('poTimer').textContent = '5초 후 사라집니다';
-  policeTimerInterval = setInterval(() => {
+  policeTimer = setInterval(() => {
     count--;
     document.getElementById('poTimer').textContent = count > 0 ? `${count}초 후 사라집니다` : '사라집니다';
     if (count <= 0) {
-      clearInterval(policeTimerInterval); policeTimerInterval = null;
-      overlay.style.display = 'none';
+      clearInterval(policeTimer); policeTimer = null;
+      document.getElementById('policeOverlay').style.display = 'none';
       showScreen('blackScreen');
     }
   }, 1000);
 }
 
-// ── 야간 결과 오버레이 ──
+// ── 야간 결과 ──
 function showNightResult() {
-  nightOverlayShown = true;
-  const g = gameState;
+  nightShown = true;
+  const g    = gameState;
   const lines = [];
   if (g.doctorTarget) {
     const ds = students[g.doctorTarget];
@@ -571,88 +499,87 @@ function showNightResult() {
     lines.push(`🔪 <span style="color:#e74c3c">마피아</span>가<br><strong>${ms?ms.name:'?'}</strong> 학생을 노렸습니다.`);
   }
   const saved = g.mafiaTarget && g.mafiaTarget === g.doctorTarget;
-  if (!g.mafiaTarget) lines.push('🌙 조용한 밤이었습니다.<br>아무 일도 일어나지 않았어요.');
-  else if (saved) lines.push('💊 의사가 살려내어<br><strong style="color:#2ecc71">아무도 탈락하지 않았습니다!</strong>');
-  else { const es = g.mafiaTarget ? students[g.mafiaTarget] : null; lines.push(`💀 결국 <strong style="color:#e74c3c">${es?es.name:'?'}</strong> 학생이<br>탈락했습니다.`); }
-
+  if      (!g.mafiaTarget) lines.push('🌙 조용한 밤이었습니다.<br>아무 일도 일어나지 않았어요.');
+  else if (saved)           lines.push('💊 의사가 살려내어<br><strong style="color:#2ecc71">아무도 탈락하지 않았습니다!</strong>');
+  else {
+    const es = students[g.mafiaTarget];
+    lines.push(`💀 결국 <strong style="color:#e74c3c">${es?es.name:'?'}</strong> 학생이<br>탈락했습니다.`);
+  }
   showScreen('blackScreen');
   document.getElementById('nrIcon').textContent = (!g.mafiaTarget || saved) ? '🌙' : '💀';
   document.getElementById('nrMsg').innerHTML    = lines.join('<br><br>');
   document.getElementById('nightOverlay').style.display = 'flex';
 }
-
-window.closeNightOverlay = function() {
+document.getElementById('nrCloseBtn').addEventListener('click', () => {
   document.getElementById('nightOverlay').style.display = 'none';
   showScreen('blackScreen');
-};
+});
 
-// ── 투표 결과 화면 ──
-function getVoteResults() {
-  const votes = gameState.lastVotes || {};
-  const tally = {};
+// ── 투표 결과 ──
+function getResultData() {
+  const votes  = gameState.lastVotes || {};
+  const tally  = {};
   Object.values(students).forEach(s => { tally[String(s.number)] = 0; });
   Object.values(votes).forEach(v => { if (tally[String(v.target)] !== undefined) tally[String(v.target)]++; });
   const results = Object.values(students)
     .filter(s => tally[String(s.number)] > 0)
     .map(s => ({ number:s.number, name:s.name, role:s.role, votes:tally[String(s.number)] }))
-    .sort((a,b) => b.votes - a.votes);
+    .sort((a,b) => b.votes-a.votes);
   const maxV = results.length > 0 ? results[0].votes : 0;
   const tops = results.filter(r => r.votes === maxV);
   return { results, maxV, tops, isTie: tops.length > 1 };
 }
 
-function renderResultScreen() {
-  const { results, maxV, tops, isTie } = getVoteResults();
-  const tieElimNum = gameState.tieElimNum || '';
+function renderResult() {
+  const { results, maxV, tops, isTie } = getResultData();
   document.getElementById('resultRound').textContent = `${(gameState.round||1)-1}라운드 투표 결과`;
 
   if (chartInst) { chartInst.destroy(); chartInst = null; }
-  const ctx = document.getElementById('resultChart').getContext('2d');
-  chartInst = new Chart(ctx, {
-    type:'bar',
-    data:{
-      labels: results.map(r => `${r.number}번 ${r.name}`),
-      datasets:[{ label:'득표수', data:results.map(r=>r.votes),
-        backgroundColor: results.map(r => r.votes===maxV&&maxV>0?'rgba(231,76,60,.8)':'rgba(52,73,94,.7)'),
-        borderColor:     results.map(r => r.votes===maxV&&maxV>0?'#e74c3c':'#34495e'),
-        borderWidth:2, borderRadius:6 }]
-    },
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
-      scales:{ y:{ticks:{color:'#888',stepSize:1},grid:{color:'#222'},min:0}, x:{ticks:{color:'#ccc',font:{size:10}},grid:{display:false}} } }
-  });
+  if (results.length) {
+    const ctx = document.getElementById('resultChart').getContext('2d');
+    chartInst = new Chart(ctx, {
+      type:'bar',
+      data:{ labels:results.map(r=>`${r.number}번 ${r.name}`),
+        datasets:[{ label:'득표수', data:results.map(r=>r.votes),
+          backgroundColor:results.map(r=>r.votes===maxV&&maxV>0?'rgba(231,76,60,.8)':'rgba(52,73,94,.7)'),
+          borderColor:results.map(r=>r.votes===maxV&&maxV>0?'#e74c3c':'#34495e'),
+          borderWidth:2, borderRadius:6 }] },
+      options:{ responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+        scales:{ y:{ticks:{color:'#888',stepSize:1},grid:{color:'#222'},min:0},x:{ticks:{color:'#ccc',font:{size:10}},grid:{display:false}} } }
+    });
+  }
 
   document.getElementById('resultList').innerHTML = results.map((r,i) => {
-    const isFirst  = i===0 && r.votes>0;
-    const barPct   = maxV>0 ? Math.round(r.votes/maxV*100) : 0;
-    // 직업 공개 조건: 단독탈락이면 공개, 동점이고 tieElimNum이 이 학생이면 공개
-    const showRole = (!isTie && isFirst) || (tieElimNum && String(r.number)===String(tieElimNum));
+    const isFirst = i===0&&r.votes>0;
+    const bp      = maxV>0?Math.round(r.votes/maxV*100):0;
+    const tieElim = gameState.tieElimNum || '';
+    const showRole= (!isTie && isFirst) || (tieElim && String(r.number)===String(tieElim));
     const RC = {'마피아':'#e74c3c','시민':'#3498db','의사':'#2ecc71','경찰':'#f39c12'};
-    const badge = showRole && r.role ? `<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,.08);color:${RC[r.role]||'#888'};margin-left:4px;font-weight:700">${r.role}</span>` : '';
-    return `<div class="r-item"><div class="r-rank ${isFirst?'first':'other'}">${i+1}</div><div class="r-name">${r.number}번 ${r.name}${badge}</div><div class="r-bwrap"><div class="r-bar"><div class="r-bfill" style="width:${barPct}%"></div></div></div><div class="r-votes ${isFirst?'first':''}">${r.votes}표</div></div>`;
+    const badge = showRole&&r.role ? `<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,.08);color:${RC[r.role]||'#888'};margin-left:4px;font-weight:700">${r.role}</span>` : '';
+    return `<div class="r-item"><div class="r-rank ${isFirst?'first':'other'}">${i+1}</div><div class="r-name">${r.number}번 ${r.name}${badge}</div><div class="r-bwrap"><div class="r-bar"><div class="r-bfill" style="width:${bp}%"></div></div></div><div class="r-votes ${isFirst?'first':''}">${r.votes}표</div></div>`;
   }).join('');
 
-  updateResultBanner();
+  updateBanner();
   showScreen('resultScreen');
 }
 
-function updateResultBanner() {
-  const { results, maxV, tops, isTie } = getVoteResults();
+function updateBanner() {
+  const { maxV, tops, isTie } = getResultData();
   const tieElimNum  = gameState.tieElimNum  || '';
   const tieElimName = gameState.tieElimName || '';
   const banner = document.getElementById('resultBanner');
   if (!banner) return;
 
   if (tieElimNum) {
-    // 동점 탈락 확정
-    const elimS = students[tieElimNum];
-    const role  = elimS ? elimS.role : '';
+    const s  = students[tieElimNum];
     const RC = {'마피아':'#e74c3c','시민':'#3498db','의사':'#2ecc71','경찰':'#f39c12'};
+    const role  = s ? s.role : '';
     const badge = role ? `<span style="font-size:13px;padding:2px 10px;border-radius:10px;background:rgba(255,255,255,.08);color:${RC[role]||'#888'};margin-left:6px">${role}</span>` : '';
     banner.innerHTML = `<div class="elim-banner eliminated">🎲 랜덤 탈락: ${tieElimNum}번 ${tieElimName}${badge}</div>`;
   } else if (isTie) {
     banner.innerHTML = `<div class="elim-banner tie">⚖️ 동점입니다! 잠시 후 탈락자가 발표됩니다...</div>`;
-  } else if (tops.length === 1 && maxV > 0) {
-    const t = tops[0];
+  } else if (tops.length===1 && maxV>0) {
+    const t  = tops[0];
     const RC = {'마피아':'#e74c3c','시민':'#3498db','의사':'#2ecc71','경찰':'#f39c12'};
     const badge = t.role ? `<span style="font-size:13px;padding:2px 10px;border-radius:10px;background:rgba(255,255,255,.08);color:${RC[t.role]||'#888'};margin-left:6px">${t.role}</span>` : '';
     banner.innerHTML = `<div class="elim-banner eliminated">🔻 탈락: ${t.number}번 ${t.name}${badge}</div>`;
@@ -661,22 +588,15 @@ function updateResultBanner() {
   }
 }
 
-// ── 승리 화면 ──
+// ── 승리 ──
 function showWin() {
-  const winner = gameState.winner || 'citizen';
-  document.getElementById('winIcon').textContent  = winner==='mafia' ? '🔪' : '🎉';
-  document.getElementById('winTitle').className   = 'win-title ' + (winner==='mafia'?'mafia':'citizen');
-  document.getElementById('winTitle').textContent = winner==='mafia' ? '마피아 승리!' : '시민 승리!';
-  document.getElementById('winMsg').textContent   = winner==='mafia'
-    ? '마피아가 시민을 모두 제압했습니다!'
-    : '시민들이 마피아를 모두 찾아냈습니다!';
+  const w = gameState.winner || 'citizen';
+  document.getElementById('winIcon').textContent  = w==='mafia' ? '🔪' : '🎉';
+  document.getElementById('winTitle').className   = 'win-title ' + (w==='mafia'?'mafia':'citizen');
+  document.getElementById('winTitle').textContent = w==='mafia' ? '마피아 승리!' : '시민 승리!';
+  document.getElementById('winMsg').textContent   = w==='mafia' ? '마피아가 시민을 모두 제압했습니다!' : '시민들이 마피아를 모두 찾아냈습니다!';
   showScreen('winScreen');
 }
-
-// Enter 키
-document.addEventListener('keydown', e => {
-  if (e.key==='Enter' && document.getElementById('loginScreen').style.display !== 'none') login();
-});
 </script>
 </body>
 </html>
