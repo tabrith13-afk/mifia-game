@@ -278,22 +278,34 @@ window.login = async function() {
 
 // ── Firebase 리스너 시작 ──
 function startListening() {
-  // 게임 상태 구독
-  unsubGame = onValue(ref(db, 'game'), snap => {
-    gameState = snap.val() || {};
-    onGameStateChange();
-  });
-  // 학생 목록 구독
-  unsubStudents = onValue(ref(db, 'students'), snap => {
+  // students를 먼저 한 번 읽은 뒤 game 구독 (타이밍 문제 방지)
+  get(ref(db, 'students')).then(snap => {
     students = snap.val() || {};
-    // 내 상태 동기화
-    if (students[me.number]) {
-      const s = students[me.number];
-      me.alive       = s.alive !== false;
-      me.role        = s.role || me.role;
-      me.roleChecked = s.roleChecked === true;
-    }
+    syncMe();
+
+    // students 실시간 구독
+    unsubStudents = onValue(ref(db, 'students'), snap2 => {
+      students = snap2.val() || {};
+      syncMe();
+      // game 상태가 이미 있으면 재처리
+      if (gameState) onGameStateChange();
+    });
+
+    // students 로드 완료 후 game 구독 시작
+    unsubGame = onValue(ref(db, 'game'), snap3 => {
+      gameState = snap3.val() || {};
+      onGameStateChange();
+    });
   });
+}
+
+// 내 정보를 Firebase students 기준으로 동기화
+function syncMe() {
+  const myData = students[String(me.number)];
+  if (!myData) return;
+  me.alive       = myData.alive !== false && myData.alive !== 'false';
+  me.role        = myData.role        || me.role;
+  me.roleChecked = myData.roleChecked || me.roleChecked;
 }
 
 // ── 게임 상태 변경 핸들러 ──
@@ -301,13 +313,7 @@ function onGameStateChange() {
   if (!gameState || !me) return;
   const status = gameState.status || 'waiting';
 
-  // 최신 내 정보 동기화 (role, alive 모두 Firebase 기준으로)
-  const myData = students[String(me.number)];
-  if (myData) {
-    me.alive       = myData.alive !== false && myData.alive !== 'false';
-    me.role        = myData.role        || me.role;
-    me.roleChecked = myData.roleChecked || me.roleChecked;
-  }
+  // 탈락/승리 체크
   if (!me.alive && status !== 'win') { showScreen('elimScreen'); lastStatus = status; return; }
 
   // 승리 체크
