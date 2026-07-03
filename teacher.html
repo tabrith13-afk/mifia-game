@@ -4,7 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>마피아 게임 - 교사 관리</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js">
+// ── 버튼 이벤트 리스너 등록 ──
+document.addEventListener('DOMContentLoaded', () => {
+  const bind = (id, fn) => { const el = document.getElementById(id); if(el) el.addEventListener('click', fn); };
+  bind('btnImport',      importFromSheets);
+  bind('btnAssign',      assignRoles);
+  bind('btnStartVote',   startVoting);
+  bind('btnEndVote',     endVoting);
+  bind('btnNight',       startNight);
+  bind('btnMafiaVote',   endMafiaVote);
+  bind('btnFinishNight', finishNight);
+  bind('btnReset',       resetGame);
+  bind('btnReset2',      resetGame);
+});
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:#0d0d0d;color:#e0e0e0;min-height:100vh}
@@ -83,7 +97,7 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:#0d0
     <div class="login-title">🎭 마피아 관리자</div>
     <div class="login-sub">교사용 관리 화면입니다</div>
     <input type="password" id="teacherPw" placeholder="관리자 비밀번호">
-    <button class="btn-p" onclick="teacherLogin()">관리자로 입장</button>
+    <button class="btn-p" id="loginBtn">관리자로 입장</button>
     <div class="err" id="loginErr"></div>
   </div>
 </div>
@@ -97,21 +111,21 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:#0d0
   <!-- 승리 안내 -->
   <div id="winSection" style="display:none" class="sec">
     <div id="winBox"></div>
-    <button class="ba gray" onclick="resetGame()" style="width:100%;margin-top:12px">🔄 새 게임 시작</button>
+    <button class="ba gray" id="btnReset" style="width:100%;margin-top:12px">🔄 새 게임 시작</button>
   </div>
 
   <!-- 게임 제어 -->
   <div class="sec">
     <div class="sec-title">⚡ 게임 제어</div>
     <div class="btn-grid">
-      <button class="ba yellow" onclick="importFromSheets()">📋 시트에서 명단 가져오기</button>
-      <button class="ba green"  onclick="assignRoles()">🎲 역할 배정</button>
-      <button class="ba red"    onclick="startVoting()">🗳️ 낮 투표 시작</button>
-      <button class="ba blue"   onclick="endVoting()">⏹️ 투표 종료</button>
-      <button class="ba purple" onclick="startNight()">🌙 야간 시작</button>
-      <button class="ba orange" onclick="endMafiaVote()">🔪 마피아투표 종료</button>
-      <button class="ba blue"   onclick="finishNight()">☀️ 야간 결과 종료</button>
-      <button class="ba gray"   onclick="resetGame()">🔄 게임 초기화</button>
+      <button class="ba yellow" id="btnImport">📋 시트에서 명단 가져오기</button>
+      <button class="ba green"  id="btnAssign">🎲 역할 배정</button>
+      <button class="ba red"    id="btnStartVote">🗳️ 낮 투표 시작</button>
+      <button class="ba blue"   id="btnEndVote">⏹️ 투표 종료</button>
+      <button class="ba purple" id="btnNight">🌙 야간 시작</button>
+      <button class="ba orange" id="btnMafiaVote">🔪 마피아투표 종료</button>
+      <button class="ba blue"   id="btnFinishNight">☀️ 야간 결과 종료</button>
+      <button class="ba gray"   id="btnReset">🔄 게임 초기화</button>
     </div>
   </div>
 
@@ -168,14 +182,13 @@ import { getDatabase, ref, onValue, set, get, update, remove } from 'https://www
 
 // ★ 여기에 Firebase 설정 붙여넣기 (index.html과 동일)
 const firebaseConfig = {
-  apiKey: "AIzaSyCfs53WSXyT3wNRpCJKfx-lylAQKjf0ZjQ",
-  authDomain: "mafia-65163.firebaseapp.com",
-  databaseURL: "https://mafia-65163-default-rtdb.firebaseio.com",
-  projectId: "mafia-65163",
-  storageBucket: "mafia-65163.firebasestorage.app",
-  messagingSenderId: "516118446900",
-  appId: "1:516118446900:web:864350c44cf60732721b61",
-  measurementId: "G-BJSKJMXP1G"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -188,8 +201,8 @@ let chartInst = null;
 let tieTimer  = null;
 let resultRendered = false;
 
-// ── 로그인 ──
-window.teacherLogin = function() {
+// ── 로그인 (이벤트 리스너 방식 - module 스코프 문제 해결) ──
+function doLogin() {
   if (document.getElementById('teacherPw').value !== TEACHER_PW) {
     document.getElementById('loginErr').textContent = '비밀번호가 틀렸습니다.';
     return;
@@ -197,8 +210,9 @@ window.teacherLogin = function() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('mainScreen').style.display  = 'block';
   startListening();
-};
-document.getElementById('teacherPw').addEventListener('keydown', e => { if(e.key==='Enter') teacherLogin(); });
+}
+document.getElementById('loginBtn').addEventListener('click', doLogin);
+document.getElementById('teacherPw').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 
 // ── Firebase 구독 ──
 function startListening() {
@@ -429,13 +443,13 @@ async function checkWinCondition() {
 }
 
 // ── 게임 제어 ──
-window.importFromSheets = function() {
+function importFromSheets() {
   const url = prompt('구글 시트에서 내보낸 JSON URL을 입력하세요:\n(또는 아래 직접 입력 형식을 사용하세요)');
   if (!url) return;
   toast('📋 시트에서 명단을 가져오려면 설치 가이드의 Apps Script 내보내기를 사용하세요.', true);
 };
 
-window.assignRoles = async function() {
+async function assignRoles() {
   const alive = Object.values(students).filter(s => s.alive !== false);
   const total = alive.length;
   if (total < 6) { toast('최소 6명 이상 필요합니다.', true); return; }
@@ -465,14 +479,14 @@ window.assignRoles = async function() {
   toast(`✅ 총 ${total}명 | 마피아 ${mafiaCount}명, 의사 1명, 경찰 1명 배정 완료`);
 };
 
-window.startVoting = async function() {
+async function startVoting() {
   await update(ref(db, 'game'), {
     status:'voting', votes:{}, tieElimNum:'', tieElimName:'', round:(gameState.round||1)
   });
   toast('🗳️ 낮 투표 시작!');
 };
 
-window.endVoting = async function() {
+async function endVoting() {
   const { tops, isTie, maxV } = getVoteData();
   const curRound = gameState.round || 1;
   const updates  = {
@@ -493,7 +507,7 @@ window.endVoting = async function() {
   toast('⏹️ 투표 종료!');
 };
 
-window.startNight = async function() {
+async function startNight() {
   const alive     = Object.values(students).filter(s=>s.alive!==false);
   const hasDoctor = alive.some(s=>s.role==='의사');
   await update(ref(db,'game'), {
@@ -504,7 +518,7 @@ window.startNight = async function() {
   toast('🌙 야간 시작!');
 };
 
-window.endMafiaVote = async function() {
+async function endMafiaVote() {
   const votes   = gameState.nightVotes || {};
   const tally   = {};
   const mafias  = Object.values(students).filter(s=>s.alive!==false&&s.role==='마피아');
@@ -543,12 +557,12 @@ async function resolveNight(mafiaTarget) {
   checkWinCondition();
 }
 
-window.finishNight = async function() {
+async function finishNight() {
   await update(ref(db,'game'), { status:'waiting' });
   toast('☀️ 야간 종료!');
 };
 
-window.resetGame = async function() {
+async function resetGame() {
   if (!confirm('게임을 초기화하시겠습니까?')) return;
   const updates = { game:{ status:'waiting', round:1, votes:{}, lastVotes:{}, nightVotes:{}, doctorTarget:'', mafiaTarget:'', policeTarget:'', tieElimNum:'', tieElimName:'', winner:'' } };
   const stuList = Object.values(students);
@@ -579,6 +593,20 @@ function toast(msg, isErr=false) {
   t.className   = isErr ? 'error show' : 'show';
   setTimeout(()=>{ t.className=''; }, 3000);
 }
+
+// ── 버튼 이벤트 리스너 등록 ──
+document.addEventListener('DOMContentLoaded', () => {
+  const bind = (id, fn) => { const el = document.getElementById(id); if(el) el.addEventListener('click', fn); };
+  bind('btnImport',      importFromSheets);
+  bind('btnAssign',      assignRoles);
+  bind('btnStartVote',   startVoting);
+  bind('btnEndVote',     endVoting);
+  bind('btnNight',       startNight);
+  bind('btnMafiaVote',   endMafiaVote);
+  bind('btnFinishNight', finishNight);
+  bind('btnReset',       resetGame);
+  bind('btnReset2',      resetGame);
+});
 </script>
 </body>
 </html>
