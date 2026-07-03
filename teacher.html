@@ -450,6 +450,8 @@ async function startVoting() {
 
 async function endVoting() {
   const { tops, isTie, maxV } = getVoteData();
+  console.log('tops:', JSON.stringify(tops));  // ← 이 줄 추가
+  console.log('isTie:', isTie, 'maxV:', maxV); // ← 이 줄 추가
   const curRound = gameState.round || 1;
   const updates  = { status:'result', lastVotes: gameState.votes||{}, round: curRound+1, tieElimNum:'', tieElimName:'' };
   if (!isTie && tops.length===1 && maxV>0) {
