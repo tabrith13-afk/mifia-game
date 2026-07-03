@@ -4,21 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>마피아 게임 - 교사 관리</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js">
-// ── 버튼 이벤트 리스너 등록 ──
-document.addEventListener('DOMContentLoaded', () => {
-  const bind = (id, fn) => { const el = document.getElementById(id); if(el) el.addEventListener('click', fn); };
-  bind('btnImport',      importFromSheets);
-  bind('btnAssign',      assignRoles);
-  bind('btnStartVote',   startVoting);
-  bind('btnEndVote',     endVoting);
-  bind('btnNight',       startNight);
-  bind('btnMafiaVote',   endMafiaVote);
-  bind('btnFinishNight', finishNight);
-  bind('btnReset',       resetGame);
-  bind('btnReset2',      resetGame);
-});
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:#0d0d0d;color:#e0e0e0;min-height:100vh}
@@ -108,13 +94,11 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:#0d0
     <div class="badge waiting" id="statusBadge">대기중</div>
   </div>
 
-  <!-- 승리 안내 -->
   <div id="winSection" style="display:none" class="sec">
     <div id="winBox"></div>
-    <button class="ba gray" id="btnReset" style="width:100%;margin-top:12px">🔄 새 게임 시작</button>
+    <button class="ba gray" id="btnReset2" style="width:100%;margin-top:12px">🔄 새 게임 시작</button>
   </div>
 
-  <!-- 게임 제어 -->
   <div class="sec">
     <div class="sec-title">⚡ 게임 제어</div>
     <div class="btn-grid">
@@ -129,7 +113,6 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:#0d0
     </div>
   </div>
 
-  <!-- 낮 투표 현황 -->
   <div class="sec" id="voteSection" style="display:none">
     <div class="sec-title">📊 투표 현황</div>
     <div class="vct" id="voteCnt">0</div>
@@ -139,7 +122,6 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:#0d0
     <div class="nvl" id="notVotedList"></div>
   </div>
 
-  <!-- 마피아 야간 투표 현황 -->
   <div class="sec" id="mafiaVoteSection" style="display:none">
     <div class="sec-title">🔪 마피아 야간 투표 현황</div>
     <div class="vct" id="mafiaVoteCnt">0</div>
@@ -148,7 +130,6 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:#0d0
     <div class="nvl" id="mafiaNotVotedList"></div>
   </div>
 
-  <!-- 투표 결과 -->
   <div class="sec" id="resultSection" style="display:none">
     <div class="sec-title">🏆 투표 결과</div>
     <div class="chart-box"><canvas id="voteChart"></canvas></div>
@@ -156,13 +137,11 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:#0d0
     <div id="tieBox"></div>
   </div>
 
-  <!-- 야간 현황 -->
   <div class="sec" id="nightSection" style="display:none">
     <div class="sec-title">🌙 야간 진행 상황</div>
     <div class="ns-box" id="nightStatusBox"></div>
   </div>
 
-  <!-- 학생 현황 -->
   <div class="sec">
     <div class="sec-title">👥 학생 현황</div>
     <div style="overflow-x:auto">
@@ -178,9 +157,9 @@ body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:#0d0
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, onValue, set, get, update, remove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { getDatabase, ref, onValue, get, update } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
-// ★ 여기에 Firebase 설정 붙여넣기 (index.html과 동일)
+// ★ Firebase 설정 (본인 설정으로 교체)
 const firebaseConfig = {
   apiKey: "AIzaSyCfs53WSXyT3wNRpCJKfx-lylAQKjf0ZjQ",
   authDomain: "mafia-65163.firebaseapp.com",
@@ -188,21 +167,20 @@ const firebaseConfig = {
   projectId: "mafia-65163",
   storageBucket: "mafia-65163.firebasestorage.app",
   messagingSenderId: "516118446900",
-  appId: "1:516118446900:web:864350c44cf60732721b61",
-  measurementId: "G-BJSKJMXP1G"
+  appId: "1:516118446900:web:864350c44cf60732721b61"
 };
 
 const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 
-const TEACHER_PW = '1234'; // ★ 교사 비밀번호
+const TEACHER_PW = '1234';
 let gameState = null;
 let students  = {};
 let chartInst = null;
 let tieTimer  = null;
 let resultRendered = false;
 
-// ── 로그인 (이벤트 리스너 방식 - module 스코프 문제 해결) ──
+// ── 로그인 ──
 function doLogin() {
   if (document.getElementById('teacherPw').value !== TEACHER_PW) {
     document.getElementById('loginErr').textContent = '비밀번호가 틀렸습니다.';
@@ -213,7 +191,7 @@ function doLogin() {
   startListening();
 }
 document.getElementById('loginBtn').addEventListener('click', doLogin);
-document.getElementById('teacherPw').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('teacherPw').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
 // ── Firebase 구독 ──
 function startListening() {
@@ -240,32 +218,27 @@ function renderAll() {
   badge.textContent = STATUS_MAP[status] || status;
   badge.className   = 'badge ' + status;
 
-  // 승리 섹션
   const isWin = status === 'win';
-  document.getElementById('winSection').style.display  = isWin ? 'block' : 'none';
+  document.getElementById('winSection').style.display = isWin ? 'block' : 'none';
   if (isWin) {
     const w = gameState.winner || 'citizen';
     document.getElementById('winBox').innerHTML =
       `<div class="win-box ${w}">${w==='mafia'?'🔪 마피아 승리!':'🎉 시민 승리!'}</div>`;
   }
 
-  // 낮 투표 현황
   const inVoting = status === 'voting';
   document.getElementById('voteSection').style.display = inVoting ? 'block' : 'none';
   if (inVoting) renderVoteProgress();
 
-  // 마피아 야간 투표
   const inMafia = status === 'night_mafia';
   document.getElementById('mafiaVoteSection').style.display = inMafia ? 'block' : 'none';
   if (inMafia) renderMafiaVoteProgress();
 
-  // 투표 결과
   const inResult = status === 'result';
   document.getElementById('resultSection').style.display = inResult ? 'block' : 'none';
   if (inResult && !resultRendered) { renderVoteResult(); resultRendered = true; }
   if (!inResult) resultRendered = false;
 
-  // 야간 현황
   const isNight = ['night_doctor','night_mafia','night_police','night_result'].includes(status);
   document.getElementById('nightSection').style.display = isNight ? 'block' : 'none';
   if (isNight) renderNightStatus();
@@ -273,49 +246,46 @@ function renderAll() {
   renderStudentTable();
 }
 
-// ── 낮 투표 현황 ──
 function renderVoteProgress() {
-  const votes  = gameState.votes || {};
-  const alive  = Object.values(students).filter(s => s.alive !== false);
-  const voted  = Object.keys(votes).filter(k => alive.find(s => String(s.number)===k));
-  const pct    = alive.length ? Math.round(voted.length/alive.length*100) : 0;
+  const votes    = gameState.votes || {};
+  const alive    = Object.values(students).filter(s => s.alive !== false);
+  const voted    = Object.keys(votes).filter(k => alive.find(s => String(s.number) === k));
+  const pct      = alive.length ? Math.round(voted.length / alive.length * 100) : 0;
   document.getElementById('voteCnt').textContent   = voted.length;
   document.getElementById('voteLabel').textContent = `/ ${alive.length}명 투표 완료 (${pct}%)`;
   document.getElementById('voteBar').style.width   = pct + '%';
   const notVoted = alive.filter(s => !voted.includes(String(s.number)));
   document.getElementById('notVotedList').innerHTML = notVoted.length
-    ? notVoted.map(s=>`<span class="nvc">${s.number}번 ${s.name}</span>`).join('')
+    ? notVoted.map(s => `<span class="nvc">${s.number}번 ${s.name}</span>`).join('')
     : '<span style="color:#555;font-size:13px">모두 투표 완료!</span>';
 }
 
-// ── 마피아 야간 투표 현황 ──
 function renderMafiaVoteProgress() {
-  const votes  = gameState.nightVotes || {};
-  const mafias = Object.values(students).filter(s => s.alive!==false && s.role==='마피아');
-  const voted  = Object.keys(votes).filter(k => mafias.find(s => String(s.number)===k));
-  const pct    = mafias.length ? Math.round(voted.length/mafias.length*100) : 0;
+  const votes    = gameState.nightVotes || {};
+  const mafias   = Object.values(students).filter(s => s.alive !== false && s.role === '마피아');
+  const voted    = Object.keys(votes).filter(k => mafias.find(s => String(s.number) === k));
+  const pct      = mafias.length ? Math.round(voted.length / mafias.length * 100) : 0;
   document.getElementById('mafiaVoteCnt').textContent   = voted.length;
   document.getElementById('mafiaVoteLabel').textContent = `/ ${mafias.length}명 마피아 투표 완료 (${pct}%)`;
   document.getElementById('mafiaVoteBar').style.width   = pct + '%';
   const notVoted = mafias.filter(s => !voted.includes(String(s.number)));
   document.getElementById('mafiaNotVotedList').innerHTML = notVoted.length
-    ? notVoted.map(s=>`<span class="nvc">${s.number}번 ${s.name}</span>`).join('')
+    ? notVoted.map(s => `<span class="nvc">${s.number}번 ${s.name}</span>`).join('')
     : '<span style="color:#555;font-size:13px">모두 투표 완료!</span>';
 }
 
-// ── 투표 결과 ──
 function getVoteData() {
-  const votes = gameState.lastVotes || {};
-  const tally = {};
+  const votes   = gameState.lastVotes || {};
+  const tally   = {};
   Object.values(students).forEach(s => { tally[String(s.number)] = 0; });
-  Object.values(votes).forEach(v => { if(tally[String(v.target)]!==undefined) tally[String(v.target)]++; });
+  Object.values(votes).forEach(v => { if (tally[String(v.target)] !== undefined) tally[String(v.target)]++; });
   const results = Object.values(students)
     .filter(s => tally[String(s.number)] > 0)
-    .map(s => ({ number:s.number, name:s.name, role:s.role, votes:tally[String(s.number)] }))
-    .sort((a,b) => b.votes-a.votes);
+    .map(s => ({ number: s.number, name: s.name, role: s.role, votes: tally[String(s.number)] }))
+    .sort((a, b) => b.votes - a.votes);
   const maxV = results.length > 0 ? results[0].votes : 0;
   const tops = results.filter(r => r.votes === maxV);
-  return { results, maxV, tops, isTie: tops.length>1 };
+  return { results, maxV, tops, isTie: tops.length > 1 };
 }
 
 function renderVoteResult() {
@@ -326,14 +296,16 @@ function renderVoteResult() {
   if (chartInst) { chartInst.destroy(); chartInst = null; }
   const ctx = document.getElementById('voteChart').getContext('2d');
   chartInst = new Chart(ctx, {
-    type:'bar',
-    data:{ labels:results.map(r=>`${r.number}번 ${r.name}`),
-      datasets:[{ label:'득표수', data:results.map(r=>r.votes),
-        backgroundColor:results.map(r=>r.votes===maxV&&maxV>0?'rgba(231,76,60,.8)':'rgba(52,73,94,.8)'),
-        borderColor:results.map(r=>r.votes===maxV&&maxV>0?'#e74c3c':'#34495e'),
-        borderWidth:2,borderRadius:8 }] },
-    options:{ responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{ y:{ticks:{color:'#888',stepSize:1},grid:{color:'#222'},min:0},x:{ticks:{color:'#ccc'},grid:{display:false}} } }
+    type: 'bar',
+    data: {
+      labels: results.map(r => `${r.number}번 ${r.name}`),
+      datasets: [{ label:'득표수', data: results.map(r => r.votes),
+        backgroundColor: results.map(r => r.votes===maxV&&maxV>0?'rgba(231,76,60,.8)':'rgba(52,73,94,.8)'),
+        borderColor:     results.map(r => r.votes===maxV&&maxV>0?'#e74c3c':'#34495e'),
+        borderWidth:2, borderRadius:8 }]
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{ y:{ticks:{color:'#888',stepSize:1},grid:{color:'#222'},min:0}, x:{ticks:{color:'#ccc'},grid:{display:false}} } }
   });
 
   const RC = {'마피아':'mafia','시민':'citizen','의사':'doctor','경찰':'police'};
@@ -355,10 +327,7 @@ function renderVoteResult() {
       countdown--;
       const el = document.getElementById('tieCnt');
       if (el) el.textContent = countdown;
-      if (countdown <= 0) {
-        clearInterval(tieTimer); tieTimer = null;
-        runAutoRandom(tops.map(s=>s.number));
-      }
+      if (countdown <= 0) { clearInterval(tieTimer); tieTimer = null; runAutoRandom(tops.map(s=>s.number)); }
     }, 1000);
   } else {
     document.getElementById('tieBox').innerHTML = '';
@@ -368,50 +337,48 @@ function renderVoteResult() {
 async function runAutoRandom(candidates) {
   const picked  = candidates[Math.floor(Math.random()*candidates.length)];
   const student = students[picked];
-  // 탈락 처리
   await update(ref(db, `students/${picked}`), { alive: false });
-  // Firebase에 동점 탈락 기록 (학생 화면에서 읽어감)
-  await update(ref(db, 'game'), {
-    tieElimNum:  String(picked),
-    tieElimName: student ? student.name : ''
-  });
-  toast(`🎲 ${student?student.name:'?'} (${picked}번) 랜덤 탈락!`);
+  await update(ref(db, 'game'), { tieElimNum: String(picked), tieElimName: student ? student.name : '' });
+  showToast(`🎲 ${student?student.name:'?'} (${picked}번) 랜덤 탈락!`);
   document.getElementById('tieBox').innerHTML =
     `<div style="margin-top:16px;padding:14px;background:rgba(231,76,60,.1);border:2px solid #e74c3c;border-radius:12px;text-align:center;font-size:16px;font-weight:800;color:#e74c3c">🎲 랜덤 탈락: ${picked}번 ${student?student.name:''}</div>`;
-  // 승리 조건 체크
   checkWinCondition();
 }
 
-// ── 야간 현황 ──
 function renderNightStatus() {
   const g = gameState;
   const items = [];
   if (g.doctorTarget) {
     const ds = students[g.doctorTarget];
-    items.push(`<div class="ns-item"><span class="ns-label">🏥 의사 보호</span><span class="ns-val" style="color:#2ecc71">${ds?ds.name:g.doctorTarget}번</span></div>`);
+    items.push(`<div class="ns-item"><span class="ns-label">🏥 의사 보호</span><span class="ns-val" style="color:#2ecc71">${ds?ds.name:'?'} (${g.doctorTarget}번)</span></div>`);
   }
   if (g.mafiaTarget) {
     const ms = students[g.mafiaTarget];
-    items.push(`<div class="ns-item"><span class="ns-label">🔪 마피아 대상</span><span class="ns-val" style="color:#9b59b6">${ms?ms.name:g.mafiaTarget}번</span></div>`);
+    items.push(`<div class="ns-item"><span class="ns-label">🔪 마피아 대상</span><span class="ns-val" style="color:#9b59b6">${ms?ms.name:'?'} (${g.mafiaTarget}번)</span></div>`);
   }
   if (g.policeTarget) {
     const ps = students[g.policeTarget];
-    items.push(`<div class="ns-item"><span class="ns-label">🚔 경찰 조사</span><span class="ns-val" style="color:#f39c12">${ps?ps.name:g.policeTarget}번</span></div>`);
+    items.push(`<div class="ns-item"><span class="ns-label">🚔 경찰 조사</span><span class="ns-val" style="color:#f39c12">${ps?ps.name:'?'} (${g.policeTarget}번)</span></div>`);
   }
   if (g.status === 'night_result') {
     const saved = g.mafiaTarget && g.mafiaTarget === g.doctorTarget;
-    const msg   = !g.mafiaTarget ? '조용한 밤' : saved ? '<span style="color:#2ecc71">의사가 살림</span>' : `<span style="color:#e74c3c">${students[g.mafiaTarget]?students[g.mafiaTarget].name:'?'} 탈락</span>`;
+    const ms    = students[g.mafiaTarget];
+    const msg   = !g.mafiaTarget ? '조용한 밤' : saved
+      ? '<span style="color:#2ecc71">의사가 살림 (탈락 없음)</span>'
+      : `<span style="color:#e74c3c">${ms?ms.name:'?'} 탈락</span>`;
     items.push(`<div class="ns-item"><span class="ns-label">💀 최종 결과</span><span class="ns-val">${msg}</span></div>`);
   }
   document.getElementById('nightStatusBox').innerHTML = items.join('') || '<div style="color:#555;font-size:13px">진행 중...</div>';
 }
 
-// ── 학생 테이블 ──
 function renderStudentTable() {
-  const RC = {'마피아':'mafia','시민':'citizen','의사':'doctor','경찰':'police'};
+  const RC    = {'마피아':'mafia','시민':'citizen','의사':'doctor','경찰':'police'};
   const tbody = document.getElementById('stuTableBody');
-  const list  = Object.values(students).sort((a,b)=>a.number-b.number);
-  if (!list.length) { tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#555;padding:20px">학생 데이터가 없습니다. 시트에서 가져오기를 클릭하세요.</td></tr>'; return; }
+  const list  = Object.values(students).sort((a,b) => Number(a.number) - Number(b.number));
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#555;padding:20px">학생 데이터가 없습니다.</td></tr>';
+    return;
+  }
   tbody.innerHTML = list.map(s => `
     <tr>
       <td style="color:#888;font-size:13px">${s.number}번</td>
@@ -419,42 +386,39 @@ function renderStudentTable() {
       <td><span class="br ${RC[s.role]||'none'}">${s.role||'-'}</span></td>
       <td><span class="ba2 ${s.alive!==false?'alive':'dead'}">${s.alive!==false?'생존':'탈락'}</span></td>
       <td style="color:${s.roleChecked?'#2ecc71':'#555'};font-size:13px">${s.roleChecked?'✅ 확인':'미확인'}</td>
-      <td>${s.alive!==false
-        ? `<button onclick="manualElim('${s.number}','${s.name}')" style="padding:4px 10px;background:transparent;border:1px solid #e74c3c;border-radius:6px;color:#e74c3c;cursor:pointer;font-size:12px">탈락</button>`
-        : `<button onclick="manualRevive('${s.number}')" style="padding:4px 10px;background:transparent;border:1px solid #2ecc71;border-radius:6px;color:#2ecc71;cursor:pointer;font-size:12px">복구</button>`
-      }</td>
+      <td>
+        ${s.alive!==false
+          ? `<button onclick="window._elim('${s.number}','${s.name}')" style="padding:4px 10px;background:transparent;border:1px solid #e74c3c;border-radius:6px;color:#e74c3c;cursor:pointer;font-size:12px">탈락</button>`
+          : `<button onclick="window._revive('${s.number}')" style="padding:4px 10px;background:transparent;border:1px solid #2ecc71;border-radius:6px;color:#2ecc71;cursor:pointer;font-size:12px">복구</button>`
+        }
+      </td>
     </tr>`).join('');
 }
 
-// ── 승리 조건 체크 ──
 async function checkWinCondition() {
-  // Firebase에서 최신 students 읽어서 판단 (로컬 캐시 문제 방지)
-  const snap   = await get(ref(db, 'students'));
-  const latest = snap.val() || {};
-  const alive  = Object.values(latest).filter(s => s.alive !== false && s.alive !== 'false');
-  const mafias  = alive.filter(s => s.role === '마피아');
+  const snap     = await get(ref(db, 'students'));
+  const latest   = snap.val() || {};
+  const alive    = Object.values(latest).filter(s => s.alive !== false && s.alive !== 'false');
+  const mafias   = alive.filter(s => s.role === '마피아');
   const citizens = alive.filter(s => s.role !== '마피아');
   if (mafias.length === 0) {
     await update(ref(db, 'game'), { status:'win', winner:'citizen' });
-    toast('🎉 시민 승리!');
+    showToast('🎉 시민 승리!');
   } else if (mafias.length >= citizens.length) {
     await update(ref(db, 'game'), { status:'win', winner:'mafia' });
-    toast('🔪 마피아 승리!');
+    showToast('🔪 마피아 승리!');
   }
 }
 
-// ── 게임 제어 ──
+// 게임 제어 함수
 function importFromSheets() {
-  const url = prompt('구글 시트에서 내보낸 JSON URL을 입력하세요:\n(또는 아래 직접 입력 형식을 사용하세요)');
-  if (!url) return;
-  toast('📋 시트에서 명단을 가져오려면 설치 가이드의 Apps Script 내보내기를 사용하세요.', true);
-};
+  showToast('Firebase 콘솔에서 직접 students 노드에 데이터를 입력하거나 import-students.gs를 사용하세요.', true);
+}
 
 async function assignRoles() {
   const alive = Object.values(students).filter(s => s.alive !== false);
   const total = alive.length;
-  if (total < 6) { toast('최소 6명 이상 필요합니다.', true); return; }
-
+  if (total < 6) { showToast('최소 6명 이상 필요합니다.', true); return; }
   let mafiaCount;
   if      (total<=8)  mafiaCount=1;
   else if (total<=12) mafiaCount=2;
@@ -462,152 +426,127 @@ async function assignRoles() {
   else if (total<=23) mafiaCount=4;
   else if (total<=29) mafiaCount=5;
   else                mafiaCount=6;
-
-  const shuffled = [...alive].sort(()=>Math.random()-.5);
+  const shuffled = [...alive].sort(() => Math.random() - .5);
   const updates  = {};
   shuffled.forEach((s,i) => {
     let role = '시민';
-    if      (i < mafiaCount)          role = '마피아';
-    else if (i === mafiaCount)         role = '의사';
-    else if (i === mafiaCount+1)       role = '경찰';
+    if      (i < mafiaCount)    role = '마피아';
+    else if (i === mafiaCount)  role = '의사';
+    else if (i === mafiaCount+1)role = '경찰';
     updates[`students/${s.number}/role`]        = role;
     updates[`students/${s.number}/roleChecked`] = false;
   });
-  updates['game/status']       = 'role_assigned';
-  updates['game/tieElimNum']   = '';
-  updates['game/tieElimName']  = '';
+  updates['game/status']      = 'role_assigned';
+  updates['game/tieElimNum']  = '';
+  updates['game/tieElimName'] = '';
   await update(ref(db), updates);
-  toast(`✅ 총 ${total}명 | 마피아 ${mafiaCount}명, 의사 1명, 경찰 1명 배정 완료`);
-};
+  showToast(`✅ 총 ${total}명 | 마피아 ${mafiaCount}명, 의사 1명, 경찰 1명 배정 완료`);
+}
 
 async function startVoting() {
-  await update(ref(db, 'game'), {
-    status:'voting', votes:{}, tieElimNum:'', tieElimName:'', round:(gameState.round||1)
-  });
-  toast('🗳️ 낮 투표 시작!');
-};
+  await update(ref(db, 'game'), { status:'voting', votes:{}, tieElimNum:'', tieElimName:'', round:(gameState.round||1) });
+  showToast('🗳️ 낮 투표 시작!');
+}
 
 async function endVoting() {
   const { tops, isTie, maxV } = getVoteData();
   const curRound = gameState.round || 1;
-  const updates  = {
-    status:'result',
-    lastVotes: gameState.votes || {},
-    round: curRound + 1,
-    tieElimNum:'', tieElimName:''
-  };
-
+  const updates  = { status:'result', lastVotes: gameState.votes||{}, round: curRound+1, tieElimNum:'', tieElimName:'' };
   if (!isTie && tops.length===1 && maxV>0) {
-    // 단독 탈락: 먼저 게임 상태 업데이트, 그 다음 탈락 처리
     await update(ref(db, 'game'), updates);
     await update(ref(db, `students/${tops[0].number}`), { alive:false });
     await checkWinCondition();
   } else {
     await update(ref(db, 'game'), updates);
   }
-  toast('⏹️ 투표 종료!');
-};
+  showToast('⏹️ 투표 종료!');
+}
 
 async function startNight() {
-  const alive     = Object.values(students).filter(s=>s.alive!==false);
-  const hasDoctor = alive.some(s=>s.role==='의사');
+  const alive     = Object.values(students).filter(s => s.alive !== false);
+  const hasDoctor = alive.some(s => s.role === '의사');
   await update(ref(db,'game'), {
-    status: hasDoctor?'night_doctor':'night_mafia',
-    doctorTarget:'', mafiaTarget:'', policeTarget:'',
-    nightVotes:{}, policeDone:false
+    status: hasDoctor ? 'night_doctor' : 'night_mafia',
+    doctorTarget:'', mafiaTarget:'', policeTarget:'', nightVotes:{}, policeDone:false
   });
-  toast('🌙 야간 시작!');
-};
+  showToast('🌙 야간 시작!');
+}
 
 async function endMafiaVote() {
-  const votes   = gameState.nightVotes || {};
-  const tally   = {};
-  const mafias  = Object.values(students).filter(s=>s.alive!==false&&s.role==='마피아');
-  mafias.forEach(s=>{ tally[String(s.number)]=0; });
-
-  // 마피아 아닌 대상 집계
+  const votes  = gameState.nightVotes || {};
+  const tally  = {};
   Object.values(votes).forEach(v => {
     const key = String(v.target);
-    if (tally[key]===undefined) tally[key] = 0;
-    tally[key]++;
+    tally[key] = (tally[key] || 0) + 1;
   });
-
-  const results = Object.entries(tally).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const results = Object.entries(tally).sort((a,b) => b[1]-a[1]);
   let mafiaTarget = '';
-  if (results.length>0) {
+  if (results.length > 0) {
     const maxV = results[0][1];
-    const tops = results.filter(([,v])=>v===maxV);
+    const tops = results.filter(([,v]) => v === maxV);
     mafiaTarget = tops[Math.floor(Math.random()*tops.length)][0];
   }
-
-  const hasPolice = Object.values(students).some(s=>s.alive!==false&&s.role==='경찰');
+  const hasPolice  = Object.values(students).some(s => s.alive!==false && s.role==='경찰');
   const nextStatus = hasPolice ? 'night_police' : 'night_result';
-
   await update(ref(db,'game'), { status:nextStatus, mafiaTarget });
-
-  if (nextStatus === 'night_result') await resolveNight(mafiaTarget);
-  toast('🔪 마피아 투표 종료!');
-};
-
-async function resolveNight(mafiaTarget) {
-  const doctor = gameState.doctorTarget || '';
-  const saved  = mafiaTarget && mafiaTarget === doctor;
-  if (mafiaTarget && !saved) {
-    await update(ref(db,`students/${mafiaTarget}`), { alive:false });
+  if (nextStatus === 'night_result') {
+    const doctor = gameState.doctorTarget || '';
+    const saved  = mafiaTarget && mafiaTarget === doctor;
+    if (mafiaTarget && !saved) await update(ref(db,`students/${mafiaTarget}`), { alive:false });
+    await update(ref(db,'game'), { status:'night_result' });
+    checkWinCondition();
   }
-  checkWinCondition();
+  showToast('🔪 마피아 투표 종료!');
 }
 
 async function finishNight() {
   await update(ref(db,'game'), { status:'waiting' });
-  toast('☀️ 야간 종료!');
-};
+  showToast('☀️ 야간 종료!');
+}
 
 async function resetGame() {
   if (!confirm('게임을 초기화하시겠습니까?')) return;
-  const updates = { game:{ status:'waiting', round:1, votes:{}, lastVotes:{}, nightVotes:{}, doctorTarget:'', mafiaTarget:'', policeTarget:'', tieElimNum:'', tieElimName:'', winner:'' } };
-  const stuList = Object.values(students);
-  stuList.forEach(s => {
+  const updates = { game:{ status:'waiting', round:1, votes:{}, lastVotes:{}, nightVotes:{},
+    doctorTarget:'', mafiaTarget:'', policeTarget:'', tieElimNum:'', tieElimName:'', winner:'' } };
+  Object.values(students).forEach(s => {
     updates[`students/${s.number}/role`]        = '';
     updates[`students/${s.number}/alive`]       = true;
     updates[`students/${s.number}/roleChecked`] = false;
   });
   await update(ref(db), updates);
-  toast('🔄 초기화 완료!');
-};
+  showToast('🔄 초기화 완료!');
+}
 
-window.manualElim = async function(num, name) {
+// 동적 버튼(탈락/복구)은 window에 노출
+window._elim = async function(num, name) {
   if (!confirm(`${name} 학생을 탈락 처리하시겠습니까?`)) return;
   await update(ref(db,`students/${num}`), { alive:false });
   checkWinCondition();
-  toast(`${name} 탈락 처리`);
+  showToast(`${name} 탈락 처리`);
 };
-
-window.manualRevive = async function(num) {
+window._revive = async function(num) {
   await update(ref(db,`students/${num}`), { alive:true });
-  toast('복구 완료');
+  showToast('복구 완료');
 };
 
-function toast(msg, isErr=false) {
+function showToast(msg, isErr=false) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.className   = isErr ? 'error show' : 'show';
-  setTimeout(()=>{ t.className=''; }, 3000);
+  setTimeout(() => { t.className = ''; }, 3000);
 }
 
-// ── 버튼 이벤트 리스너 등록 ──
-document.addEventListener('DOMContentLoaded', () => {
-  const bind = (id, fn) => { const el = document.getElementById(id); if(el) el.addEventListener('click', fn); };
-  bind('btnImport',      importFromSheets);
-  bind('btnAssign',      assignRoles);
-  bind('btnStartVote',   startVoting);
-  bind('btnEndVote',     endVoting);
-  bind('btnNight',       startNight);
-  bind('btnMafiaVote',   endMafiaVote);
-  bind('btnFinishNight', finishNight);
-  bind('btnReset',       resetGame);
-  bind('btnReset2',      resetGame);
-});
+// ── 버튼 이벤트 리스너 (모듈 스크립트 내에서 직접 바인딩) ──
+document.getElementById('btnImport').addEventListener('click', importFromSheets);
+document.getElementById('btnAssign').addEventListener('click', assignRoles);
+document.getElementById('btnStartVote').addEventListener('click', startVoting);
+document.getElementById('btnEndVote').addEventListener('click', endVoting);
+document.getElementById('btnNight').addEventListener('click', startNight);
+document.getElementById('btnMafiaVote').addEventListener('click', endMafiaVote);
+document.getElementById('btnFinishNight').addEventListener('click', finishNight);
+document.getElementById('btnReset').addEventListener('click', resetGame);
+document.getElementById('btnReset2').addEventListener('click', resetGame);
+
 </script>
 </body>
 </html>
