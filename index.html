@@ -299,13 +299,17 @@ function onStateChange() {
     else updateBanner();
 
   } else if (status === 'night_doctor') {
-    const r = students[String(me.number)] ? students[String(me.number)].role : me.role;
-    if (r === '의사') renderNight('doctor');
+    const myDataD = students[String(me.number)];
+    const rD      = myDataD ? myDataD.role  : me.role;
+    const aliveD  = myDataD ? myDataD.alive !== false && myDataD.alive !== 'false' : me.alive;
+    if (rD === '의사' && aliveD) renderNight('doctor');
     else showScreen('blackScreen');
 
   } else if (status === 'night_mafia') {
-    const r = students[String(me.number)] ? students[String(me.number)].role : me.role;
-    if (r === '마피아') {
+    const myData = students[String(me.number)];
+    const r      = myData ? myData.role  : me.role;
+    const alive  = myData ? myData.alive !== false && myData.alive !== 'false' : me.alive;
+    if (r === '마피아' && alive) {
       me.role = '마피아';
       renderNight('mafia');
     } else {
@@ -313,8 +317,10 @@ function onStateChange() {
     }
 
   } else if (status === 'night_police') {
-    const r = students[String(me.number)] ? students[String(me.number)].role : me.role;
-    if (r === '경찰') renderNight('police');
+    const myDataP = students[String(me.number)];
+    const rP      = myDataP ? myDataP.role  : me.role;
+    const aliveP  = myDataP ? myDataP.alive !== false && myDataP.alive !== 'false' : me.alive;
+    if (rP === '경찰' && aliveP) renderNight('police');
     else showScreen('blackScreen');
 
   } else if (status === 'night_result') {
